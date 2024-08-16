@@ -9,7 +9,7 @@ setup(
     package_dir={"": "src"},
     entry_points={
         "console_scripts": [
-            "export-for-ai=export_for_ai.main:main",  # Note the underscore in the package name
+            "export-for-ai=main:main",  # Note the underscore in the package name
         ],
     },
     install_requires=[
