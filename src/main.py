@@ -24,9 +24,8 @@ def validate_directory(directory_path: str) -> bool:
     return True
 
 def create_export_directory(directory_path: str) -> str:
-    root_name = os.path.basename(directory_path)
-    export_dir_name = f"exported-from-{root_name}"
-    export_dir_path = os.path.join(os.path.dirname(directory_path), export_dir_name)
+    export_dir_name = "exported-for-ai-content"
+    export_dir_path = os.path.join(directory_path, export_dir_name)
     
     try:
         os.makedirs(export_dir_path, exist_ok=True)
