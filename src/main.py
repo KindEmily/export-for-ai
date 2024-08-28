@@ -5,6 +5,7 @@ from typing import Optional
 
 from export_for_ai.tree_visualizer import get_tree_structure
 from export_for_ai.folder_exporter import export_folder_content
+from export_for_ai.readme_generator import create_readme
 
 def setup_logging() -> None:
     logging.basicConfig(level=logging.INFO, format='%(levelname)s: %(message)s')
@@ -22,6 +23,19 @@ def validate_directory(directory_path: str) -> bool:
         return False
     return True
 
+def create_export_directory(directory_path: str) -> str:
+    root_name = os.path.basename(directory_path)
+    export_dir_name = f"exported-from-{root_name}"
+    export_dir_path = os.path.join(os.path.dirname(directory_path), export_dir_name)
+    
+    try:
+        os.makedirs(export_dir_path, exist_ok=True)
+        logging.info(f"Created export directory: {export_dir_path}")
+        return export_dir_path
+    except OSError as e:
+        logging.error(f"Error creating export directory: {e}")
+        return ""
+
 def export_tree_structure(directory_path: str) -> Optional[str]:
     try:
         logging.info("Exporting directory structure...")
@@ -30,12 +44,11 @@ def export_tree_structure(directory_path: str) -> Optional[str]:
         logging.error(f"Error generating tree structure: {e}")
         return None
 
-def save_tree_structure(tree_structure: str, output_file: str = "directory_structure.txt") -> bool:
+def save_content(content: str, output_file: str) -> bool:
     try:
-        full_path = os.path.abspath(output_file)
-        with open(full_path, "w", encoding="utf-8") as f:
-            f.write(tree_structure)
-        logging.info(f"Tree structure exported to {output_file} (full path: {full_path})")
+        with open(output_file, "w", encoding="utf-8") as f:
+            f.write(content)
+        logging.info(f"Content exported to {output_file}")
         return True
     except IOError as e:
         logging.error(f"Error writing to file: {e}")
@@ -49,17 +62,6 @@ def export_folder_contents(directory_path: str) -> Optional[str]:
         logging.error(f"Error exporting folder contents: {e}")
         return None
 
-def save_folder_contents(folder_contents: str, output_file: str = "project_contents.txt") -> bool:
-    try:
-        full_path = os.path.abspath(output_file)
-        with open(full_path, "w", encoding="utf-8") as f:
-            f.write(folder_contents)
-        logging.info(f"Folder contents exported to {output_file} (full path: {full_path})")
-        return True
-    except IOError as e:
-        logging.error(f"Error writing to file: {e}")
-        return False
-
 def main() -> None:
     setup_logging()
 
@@ -70,21 +72,25 @@ def main() -> None:
     if not validate_directory(directory_path):
         return
 
+    export_dir = create_export_directory(directory_path)
+    if not export_dir:
+        return
+
     tree_structure = export_tree_structure(directory_path)
-    if not tree_structure:
-        return
-
-    print(tree_structure)
-
-    if not save_tree_structure(tree_structure):
-        return
+    if tree_structure:
+        if not save_content(tree_structure, os.path.join(export_dir, "project_structure.txt")):
+            return
 
     folder_contents = export_folder_contents(directory_path)
-    if not folder_contents:
+    if folder_contents:
+        if not save_content(folder_contents, os.path.join(export_dir, "project_contents.txt")):
+            return
+
+    readme_content = create_readme(os.path.basename(directory_path))
+    if not save_content(readme_content, os.path.join(export_dir, "README.md")):
         return
 
-    if not save_folder_contents(folder_contents):
-        return
+    logging.info(f"Export completed successfully. Files saved in {export_dir}")
 
 if __name__ == "__main__":
     main()
