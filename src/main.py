@@ -15,7 +15,7 @@ def parse_arguments() -> Optional[str]:
         logging.error("Usage: export-for-ai <directory_path>")
         return None
 
-    return os.path.normpath(sys.argv[1])
+    return os.path.abspath(sys.argv[1])
 
 def validate_directory(directory_path: str) -> bool:
     if not os.path.isdir(directory_path):
@@ -23,8 +23,12 @@ def validate_directory(directory_path: str) -> bool:
         return False
     return True
 
+def get_folder_name(directory_path: str) -> str:
+    return os.path.basename(os.path.abspath(directory_path))
+
 def create_export_directory(directory_path: str) -> str:
-    export_dir_name = "exported-for-ai-content"
+    folder_name = get_folder_name(directory_path)
+    export_dir_name = f"exported-from-{folder_name}"
     export_dir_path = os.path.join(directory_path, export_dir_name)
     
     try:
@@ -85,7 +89,7 @@ def main() -> None:
         if not save_content(folder_contents, os.path.join(export_dir, "project_contents.txt")):
             return
 
-    readme_content = create_readme(os.path.basename(directory_path))
+    readme_content = create_readme(get_folder_name(directory_path))
     if not save_content(readme_content, os.path.join(export_dir, "README.md")):
         return
 
