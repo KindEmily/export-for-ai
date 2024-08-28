@@ -1,6 +1,5 @@
 # export-for-ai
-
-A Python project created with create-py-app.
+![usage gif](https://github.com/KindEmily/export-for-ai/blob/main/demo/export-for-ai-usage.gif?raw=true)
 
 ## Why this tool? 
 THis is a tool to export data for AI processing into services like ChatGPT or Claude.ai. 
