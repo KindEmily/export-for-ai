@@ -4,6 +4,7 @@ import logging
 from typing import Optional
 
 from export_for_ai.tree_visualizer import get_tree_structure
+from export_for_ai.folder_exporter import export_folder_content
 
 def setup_logging() -> None:
     logging.basicConfig(level=logging.INFO, format='%(levelname)s: %(message)s')
@@ -12,7 +13,7 @@ def parse_arguments() -> Optional[str]:
     if len(sys.argv) != 2:
         logging.error("Usage: export-for-ai <directory_path>")
         return None
-    
+
     return os.path.normpath(sys.argv[1])
 
 def validate_directory(directory_path: str) -> bool:
@@ -40,9 +41,28 @@ def save_tree_structure(tree_structure: str, output_file: str = "directory_struc
         logging.error(f"Error writing to file: {e}")
         return False
 
+def export_folder_contents(directory_path: str) -> Optional[str]:
+    try:
+        logging.info("Exporting folder contents...")
+        return export_folder_content(directory_path)
+    except Exception as e:
+        logging.error(f"Error exporting folder contents: {e}")
+        return None
+
+def save_folder_contents(folder_contents: str, output_file: str = "project_contents.txt") -> bool:
+    try:
+        full_path = os.path.abspath(output_file)
+        with open(full_path, "w", encoding="utf-8") as f:
+            f.write(folder_contents)
+        logging.info(f"Folder contents exported to {output_file} (full path: {full_path})")
+        return True
+    except IOError as e:
+        logging.error(f"Error writing to file: {e}")
+        return False
+
 def main() -> None:
     setup_logging()
-    
+
     directory_path = parse_arguments()
     if not directory_path:
         return
@@ -57,6 +77,13 @@ def main() -> None:
     print(tree_structure)
 
     if not save_tree_structure(tree_structure):
+        return
+
+    folder_contents = export_folder_contents(directory_path)
+    if not folder_contents:
+        return
+
+    if not save_folder_contents(folder_contents):
         return
 
 if __name__ == "__main__":
