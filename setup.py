@@ -3,7 +3,7 @@
 from setuptools import setup, find_packages
 
 setup(
-    name="export-for-ai",  
+    name="export-for-ai", # export-here-from 
     version="0.1",
     packages=find_packages(where="src"),
     package_dir={"": "src"},
