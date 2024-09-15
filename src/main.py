@@ -86,7 +86,7 @@ def main() -> None:
 
     folder_contents = export_folder_contents(directory_path)
     if folder_contents:
-        if not save_content(folder_contents, os.path.join(export_dir, "project_contents.txt")):
+        if not save_content(folder_contents, os.path.join(export_dir, "project_contents.md")):
             return
 
     readme_content = create_readme(get_folder_name(directory_path))
