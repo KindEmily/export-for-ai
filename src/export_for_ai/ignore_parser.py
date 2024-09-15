@@ -18,6 +18,8 @@ DEFAULT_IGNORE_PATTERNS = [
     '*.swp',
     '*.vscode',
     '*.vs',
+    'bin',
+    'obj',
     '*.idea',
     'exported-from-*',
     '*.egg-info',

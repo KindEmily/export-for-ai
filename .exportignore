@@ -109,3 +109,4 @@ exported-from-*
 *.svg
 
 /output/
+/bin/
