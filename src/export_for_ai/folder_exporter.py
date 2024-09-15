@@ -4,6 +4,11 @@ def should_include_file(file_path):
     """Determine if a file should be included in the export."""
     excluded_extensions = {'.svg', '.css', '.gitignore', '.jpg', '.png', '.gif', '.git', '.gitignore', '.binder', '.otf', '.pyc', '.toml', '.git'}
     _, ext = os.path.splitext(file_path)
+    
+    # Check if the file is within a .git directory
+    if '.git' in file_path.split(os.sep):
+        return False
+    
     return ext.lower() not in excluded_extensions and not os.path.basename(file_path).startswith('.')
 
 def export_folder_content(path):
