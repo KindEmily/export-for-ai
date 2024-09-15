@@ -2,7 +2,7 @@ import os
 
 def should_include_file(file_path):
     """Determine if a file should be included in the export."""
-    excluded_extensions = {'.svg', '.css', '.gitignore', '.jpg', '.png', '.gif', '.git', '.gitignore'}
+    excluded_extensions = {'.svg', '.css', '.gitignore', '.jpg', '.png', '.gif', '.git', '.gitignore', '.binder', '.otf', '.pyc', '.toml', '.git'}
     _, ext = os.path.splitext(file_path)
     return ext.lower() not in excluded_extensions and not os.path.basename(file_path).startswith('.')
 
