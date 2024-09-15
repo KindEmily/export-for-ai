@@ -2,13 +2,13 @@ import os
 
 def should_include_file(file_path):
     """Determine if a file should be included in the export."""
-    excluded_extensions = {'.svg', '.css', '.gitignore', '.jpg', '.png', '.gif', '.git', '.gitignore', '.binder', '.otf', '.pyc', '.toml', '.git'}
-    excluded_directories = {'.git', '__pycache__'}
+    excluded_extensions = {'.svg', '.css', '.jpg', '.png', '.git', '.gitignore', '.binder', '.otf', '.pyc', '.toml'}
+    excluded_directories = {'.git', '__pycache__', '.vs'}
     _, ext = os.path.splitext(file_path)
     
-    # Check if the file is within an excluded directory
+    # Check if the file is within an excluded directory or starts with 'exported-from-'
     path_parts = file_path.split(os.sep)
-    if any(part in excluded_directories for part in path_parts):
+    if any(part.startswith('exported-from-') or part in excluded_directories for part in path_parts):
         return False
     
     return ext.lower() not in excluded_extensions and not os.path.basename(file_path).startswith('.')

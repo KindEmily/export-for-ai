@@ -1,9 +1,12 @@
 import os
 
+
 def should_include_item(item):
     """Determine if an item should be included in the tree visualization."""
     excluded_items = {'.git', '__pycache__'}
-    return item not in excluded_items and not item.startswith('.')
+    return (item not in excluded_items and 
+            not item.startswith('.') and 
+            not item.startswith('exported-from-'))
 
 def visualize_folder_structure(path, prefix="", is_last=True):
     output = []
