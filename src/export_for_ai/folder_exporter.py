@@ -20,10 +20,15 @@ def export_folder_content(path):
             if should_include_file(file_path):
                 try:
                     with open(file_path, 'r', encoding='utf-8') as f:
-                        content.append(f"# File: {os.path.relpath(file_path, path)}\n")
-                        content.append("```\n")
-                        content.append(f.read())
-                        content.append("\n```\n\n")
+                        file_content = f.read()
+                        if file_content.strip():
+                            content.append(f"# File: {os.path.relpath(file_path, path)}\n")
+                            content.append("```\n")
+                            content.append(file_content)
+                            content.append("\n```\n\n")
+                        else:
+                            content.append(f"# File: {os.path.relpath(file_path, path)}\n")
+                            content.append("`File is empty`\n\n")
                 except Exception as e:
                     content.append(f"Error reading {file_path}: {str(e)}\n\n")
     return ''.join(content)
