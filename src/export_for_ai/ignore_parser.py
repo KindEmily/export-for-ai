@@ -21,7 +21,14 @@ DEFAULT_IGNORE_PATTERNS = [
     '*.idea',
     'exported-from-*',
     '*.egg-info',
-    '*.egg-info/**'  # This will match all contents of egg-info directories
+    '*.egg-info/**',  # This will match all contents of egg-info directories
+    '*.png',
+    '*.jpg',
+    '*.jpeg',
+    '*.gif',
+    '*.bmp',
+    '*.tiff',
+    '*.webp'
 ]
 
 def parse_ignore_file(directory):
