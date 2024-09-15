@@ -8,7 +8,7 @@ from export_for_ai.folder_exporter import export_folder_content
 from export_for_ai.readme_generator import create_readme
 
 def setup_logging() -> None:
-    logging.basicConfig(level=logging.INFO, format='%(levelname)s: %(message)s')
+    logging.basicConfig(level=logging.DEBUG, format='%(levelname)s: %(message)s')
 
 def parse_arguments() -> Optional[str]:
     if len(sys.argv) != 2:
