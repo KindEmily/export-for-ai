@@ -1,5 +1,10 @@
 import os
 
+def should_include_item(item):
+    """Determine if an item should be included in the tree visualization."""
+    excluded_items = {'.git', '__pycache__'}
+    return item not in excluded_items and not item.startswith('.')
+
 def visualize_folder_structure(path, prefix="", is_last=True):
     output = []
     basename = os.path.basename(path)
@@ -11,7 +16,7 @@ def visualize_folder_structure(path, prefix="", is_last=True):
             output.append(prefix + ("└── " if is_last else "├── ") + basename + "/")
         
         items = sorted(os.listdir(path))
-        items = [item for item in items if not item.startswith('.')]
+        items = [item for item in items if should_include_item(item)]
         
         for index, item in enumerate(items):
             item_path = os.path.join(path, item)
