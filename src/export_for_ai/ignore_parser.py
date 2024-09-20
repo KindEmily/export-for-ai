@@ -17,6 +17,8 @@ DEFAULT_IGNORE_PATTERNS = [
     '*.tmp',
     '*.swp',
     '*.vscode',
+    '*.DS_Store',
+    '.DS_Store',
     '*.vs',
     'bin',
     'obj',
