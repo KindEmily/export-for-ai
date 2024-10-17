@@ -19,6 +19,10 @@ DEFAULT_IGNORE_PATTERNS = [
     '*.vscode',
     '*.DS_Store',
     '.DS_Store',
+    'output',
+    'output/**',
+    'exported-from-*',
+    'exported-from-**',
     '*.vs',
     'bin',
     'obj',
@@ -32,7 +36,10 @@ DEFAULT_IGNORE_PATTERNS = [
     '*.gif',
     '*.bmp',
     '*.tiff',
-    '*.webp'
+    '*.webp',
+
+    '*.json',
+    '*.csv'
 ]
 
 def parse_ignore_file(directory):
