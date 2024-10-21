@@ -38,8 +38,12 @@ DEFAULT_IGNORE_PATTERNS = [
     '*.tiff',
     '*.webp',
 
+    '*.jpg',
+
     '*.json',
+    '.csv'
     '*.csv'
+    '*.venv'
 ]
 
 def parse_ignore_file(directory):
