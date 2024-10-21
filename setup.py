@@ -1,15 +1,13 @@
-# setup.py
-
 from setuptools import setup, find_packages
 
 setup(
-    name="export-for-ai", # export-here-from 
+    name="export-for-ai",
     version="0.1",
     packages=find_packages(where="src"),
     package_dir={"": "src"},
     entry_points={
         "console_scripts": [
-            "export-for-ai=main:main",  # Note the underscore in the package name
+            "export-for-ai=export_for_ai.main:main",  # Corrected the entry point
         ],
     },
     install_requires=[

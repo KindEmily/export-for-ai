@@ -13,22 +13,39 @@ def visualize_folder_structure(path, root_path, ignore_patterns, prefix="", is_l
         else:
             output.append(prefix + ("└── " if is_last else "├── ") + basename + "/")
         
-        items = sorted(os.listdir(path))
-        items = [item for item in items if should_include_item(os.path.join(relative_path, item), ignore_patterns)]
-        
-        for index, item in enumerate(items):
+        try:
+            items = sorted(os.listdir(path))
+        except PermissionError:
+            logging.warning(f"Permission denied: {path}")
+            return output
+
+        # Separate directories and files for better tree representation
+        dirs = [item for item in items if os.path.isdir(os.path.join(path, item))]
+        files = [item for item in items if os.path.isfile(os.path.join(path, item))]
+
+        # Filter out ignored directories
+        dirs = [d for d in dirs if should_include_item(os.path.relpath(os.path.join(path, d), root_path), ignore_patterns)]
+        # Optionally, you can also filter out ignored files here if needed
+
+        combined = dirs + files
+        for index, item in enumerate(combined):
             item_path = os.path.join(path, item)
-            is_last_item = index == len(items) - 1
+            is_last_item = index == len(combined) - 1
             
-            output.extend(
-                visualize_folder_structure(
-                    item_path,
-                    root_path,
-                    ignore_patterns,
-                    prefix + ("    " if is_last else "│   "),
-                    is_last_item
+            # If it's a directory, recurse
+            if os.path.isdir(item_path):
+                output.extend(
+                    visualize_folder_structure(
+                        item_path,
+                        root_path,
+                        ignore_patterns,
+                        prefix + ("    " if is_last else "│   "),
+                        is_last_item
+                    )
                 )
-            )
+            else:
+                output.append(prefix + ("└── " if is_last_item else "├── ") + item)
+    
     else:
         output.append(prefix + ("└── " if is_last else "├── ") + basename)
     

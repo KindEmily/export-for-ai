@@ -6,7 +6,17 @@ def export_folder_content(path):
     """Export the content of all included files in the folder."""
     ignore_patterns = parse_ignore_file(path)
     content = []
-    for root, _, files in os.walk(path):
+    for root, dirs, files in os.walk(path):
+        # Modify dirs in-place to skip ignored directories
+        dirs_to_remove = []
+        for dir_name in dirs:
+            dir_path = os.path.relpath(os.path.join(root, dir_name), path)
+            if not should_include_item(dir_path, ignore_patterns):
+                dirs_to_remove.append(dir_name)
+                logging.debug(f"Skipping directory: {dir_path}")
+        for dir_name in dirs_to_remove:
+            dirs.remove(dir_name)
+        
         for file in files:
             file_path = os.path.join(root, file)
             relative_path = os.path.relpath(file_path, path)

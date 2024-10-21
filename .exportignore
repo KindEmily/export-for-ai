@@ -94,7 +94,7 @@ ENV/
 # mkdocs documentation
 /site
 
-# mypy
+#mypy
 .mypy_cache/
 
 # IDE settings
@@ -111,4 +111,4 @@ exported-from-*
 *.svg
 
 /output/
-/bin/
+.bin/

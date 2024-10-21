@@ -27,7 +27,6 @@ DEFAULT_IGNORE_PATTERNS = [
     'bin',
     'obj',
     '*.idea',
-    'exported-from-*',
     '*.egg-info',
     '*.egg-info/**',  # This will match all contents of egg-info directories
     '*.png',
@@ -37,12 +36,11 @@ DEFAULT_IGNORE_PATTERNS = [
     '*.bmp',
     '*.tiff',
     '*.webp',
-
-    '*.jpg',
-
     '*.json',
-    '.csv'
-    '*.csv'
+    '.csv',
+    '*.csv',
+    '.venv',
+    '*.jpg',
     '*.venv'
 ]
 
