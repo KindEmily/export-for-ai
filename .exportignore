@@ -110,5 +110,9 @@ exported-from-*
 *.png
 *.svg
 
+# Documentation 
+*.md
+*.txt
+
 /output/
 .bin/

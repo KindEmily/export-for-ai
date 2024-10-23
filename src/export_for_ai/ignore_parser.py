@@ -41,7 +41,10 @@ DEFAULT_IGNORE_PATTERNS = [
     '*.csv',
     '.venv',
     '*.jpg',
-    '*.venv'
+    '*.venv', 
+    
+    '*.md',
+    '*.txt'
 ]
 
 def parse_ignore_file(directory):
