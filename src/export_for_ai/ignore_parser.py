@@ -43,8 +43,12 @@ DEFAULT_IGNORE_PATTERNS = [
     '*.jpg',
     '*.venv', 
     
+    '*.log',
     '*.md',
     '*.txt'
+    '.pytest_cache', 
+    '*.pytest_cache', 
+    '.pytest_cache/**',
 ]
 
 def parse_ignore_file(directory):
