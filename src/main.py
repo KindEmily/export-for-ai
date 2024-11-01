@@ -73,7 +73,7 @@ def build_tag(tag: str, content: str, attributes: dict = None, self_closing: boo
         return f"<{tag}{attrs} />"
     else:
         escaped_content = html.escape(content)
-        return f"<{tag}{attrs}>\n{escaped_content}\n</{tag}>"
+        return f"<{tag}{attrs}>\n\n{escaped_content}\n\n</{tag}>"
 
 def save_content(content: str, output_file: str, tag: str = "LogicalBlock", attributes: dict = None) -> bool:
     """
