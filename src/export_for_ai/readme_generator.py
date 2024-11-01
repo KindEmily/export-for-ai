@@ -6,7 +6,7 @@ This folder contains an export of the {project_name} project structure and its c
 
 Files:
 1. project_structure.txt: A text representation of the project's folder structure.
-2. project_contents.txt: The contents of all relevant files in the project.
+2. project_contents.md: The contents of all relevant files in the project.
 3. README.md: This file, explaining the contents of the export.
 
 This export was created to easily share project contents and structure, particularly for use in AI-assisted development contexts.

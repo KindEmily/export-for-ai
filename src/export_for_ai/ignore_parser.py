@@ -18,7 +18,6 @@ DEFAULT_IGNORE_PATTERNS = [
     '*.swp',
     '*.vscode',
     '*.DS_Store',
-    '.DS_Store',
     'output',
     'output/**',
     'exported-from-*',
@@ -40,14 +39,11 @@ DEFAULT_IGNORE_PATTERNS = [
     '.csv',
     '*.csv',
     '.venv',
-    '*.jpg',
-    '*.venv', 
-    
     '*.log',
     '*.md',
-    '*.txt'
-    '.pytest_cache', 
-    '*.pytest_cache', 
+    '*.txt',
+    '.pytest_cache',
+    '*.pytest_cache',
     '.pytest_cache/**',
 ]
 

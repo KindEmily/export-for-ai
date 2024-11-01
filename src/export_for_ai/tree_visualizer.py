@@ -1,7 +1,7 @@
 import logging
 import os
 
-from export_for_ai.ignore_parser import should_include_item
+from export_for_ai.ignore_parser import should_include_item, parse_ignore_file  # Added parse_ignore_file import
 
 
 def visualize_folder_structure(path, root_path, ignore_patterns, prefix="", is_last=True):
@@ -23,7 +23,10 @@ def visualize_folder_structure(path, root_path, ignore_patterns, prefix="", is_l
 
         # Separate directories and files for better tree representation
         dirs = [item for item in items if os.path.isdir(os.path.join(path, item))]
-        files = [item for item in items if os.path.isfile(os.path.join(path, item))]
+        files = [
+            f for f in files
+            if should_include_item(os.path.relpath(os.path.join(path, f), root_path), ignore_patterns)
+        ]
 
         # Filter out ignored directories
         dirs = [
@@ -72,4 +75,3 @@ if __name__ == "__main__":
         print(get_tree_structure(sys.argv[1]))
     else:
         print("Please provide a path as an argument.")
-
