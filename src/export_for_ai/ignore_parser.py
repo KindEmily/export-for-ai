@@ -18,7 +18,6 @@ DEFAULT_IGNORE_PATTERNS = [
     '*.swp',
     '*.vscode',
     '*.DS_Store',
-    '.DS_Store',
     'output',
     'output/**',
     'exported-from-*',
@@ -40,14 +39,11 @@ DEFAULT_IGNORE_PATTERNS = [
     '.csv',
     '*.csv',
     '.venv',
-    '*.jpg',
-    '*.venv', 
-    
     '*.log',
     '*.md',
-    '*.txt'
-    '.pytest_cache', 
-    '*.pytest_cache', 
+    '*.txt',
+    '.pytest_cache',
+    '*.pytest_cache',
     '.pytest_cache/**',
 ]
 
@@ -65,6 +61,7 @@ def parse_ignore_file(directory):
     else:
         logging.warning("No .exportignore file found. Using default exclusion rules.")
     
+    logging.debug(f"Final ignore patterns: {ignore_patterns}")
     return ignore_patterns
 
 def should_include_item(item, ignore_patterns):
@@ -72,4 +69,5 @@ def should_include_item(item, ignore_patterns):
         if fnmatch.fnmatch(item, pattern) or any(fnmatch.fnmatch(part, pattern) for part in item.split(os.sep)):
             logging.debug(f"Ignoring {item} due to pattern {pattern}")
             return False
+    logging.debug(f"Including {item}")
     return True

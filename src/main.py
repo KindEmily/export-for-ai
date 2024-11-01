@@ -73,7 +73,7 @@ def build_tag(tag: str, content: str, attributes: dict = None, self_closing: boo
         return f"<{tag}{attrs} />"
     else:
         escaped_content = html.escape(content)
-        return f"<{tag}{attrs}>\n{escaped_content}\n</{tag}>"
+        return f"<{tag}{attrs}>\n\n{escaped_content}\n\n</{tag}>"
 
 def save_content(content: str, output_file: str, tag: str = "LogicalBlock", attributes: dict = None) -> bool:
     """
@@ -123,7 +123,7 @@ def main() -> None:
     tree_structure = export_tree_structure(directory_path)
     if tree_structure:
         tree_output_file = os.path.join(export_dir, "project_structure.txt")
-        if not save_content(tree_structure, tree_output_file):
+        if not save_content(tree_structure, tree_output_file, "SolutionTreeView"):
             return
 
     # Export Folder Contents with Correct Tag and File Path
