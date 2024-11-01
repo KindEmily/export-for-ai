@@ -61,6 +61,7 @@ def parse_ignore_file(directory):
     else:
         logging.warning("No .exportignore file found. Using default exclusion rules.")
     
+    logging.debug(f"Final ignore patterns: {ignore_patterns}")
     return ignore_patterns
 
 def should_include_item(item, ignore_patterns):
@@ -68,4 +69,5 @@ def should_include_item(item, ignore_patterns):
         if fnmatch.fnmatch(item, pattern) or any(fnmatch.fnmatch(part, pattern) for part in item.split(os.sep)):
             logging.debug(f"Ignoring {item} due to pattern {pattern}")
             return False
+    logging.debug(f"Including {item}")
     return True

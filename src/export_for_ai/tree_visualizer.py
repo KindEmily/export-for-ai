@@ -21,12 +21,9 @@ def visualize_folder_structure(path, root_path, ignore_patterns, prefix="", is_l
             logging.warning(f"Permission denied: {path}")
             return output
 
-        # Separate directories and files for better tree representation
+        # Separate directories and files
         dirs = [item for item in items if os.path.isdir(os.path.join(path, item))]
-        files = [
-            f for f in files
-            if should_include_item(os.path.relpath(os.path.join(path, f), root_path), ignore_patterns)
-        ]
+        files = [item for item in items if not os.path.isdir(os.path.join(path, item))]
 
         # Filter out ignored directories
         dirs = [
@@ -34,7 +31,7 @@ def visualize_folder_structure(path, root_path, ignore_patterns, prefix="", is_l
             if should_include_item(os.path.relpath(os.path.join(path, d), root_path), ignore_patterns)
         ]
 
-        # **Add this block to filter out ignored files**
+        # Filter out ignored files
         files = [
             f for f in files
             if should_include_item(os.path.relpath(os.path.join(path, f), root_path), ignore_patterns)
@@ -51,13 +48,12 @@ def visualize_folder_structure(path, root_path, ignore_patterns, prefix="", is_l
                         item_path,
                         root_path,
                         ignore_patterns,
-                        prefix + ("    " if is_last else "│   "),
+                        prefix + ("    " if is_last_item else "│   "),
                         is_last_item
                     )
                 )
             else:
                 output.append(prefix + ("└── " if is_last_item else "├── ") + item)
-
     else:
         output.append(prefix + ("└── " if is_last else "├── ") + basename)
 
