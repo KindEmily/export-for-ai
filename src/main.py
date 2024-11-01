@@ -122,8 +122,8 @@ def main() -> None:
     # Export Directory Structure
     tree_structure = export_tree_structure(directory_path)
     if tree_structure:
-        tree_output_file = os.path.join(export_dir, "project_structure.txt", "SolutionTreeView")
-        if not save_content(tree_structure, tree_output_file):
+        tree_output_file = os.path.join(export_dir, "project_structure.txt")
+        if not save_content(tree_structure, tree_output_file, "SolutionTreeView"):
             return
 
     # Export Folder Contents with Correct Tag and File Path
