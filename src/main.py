@@ -30,7 +30,7 @@ def validate_directory(directory_path: str) -> bool:
 def get_folder_name(directory_path: str) -> str:
     return os.path.basename(os.path.abspath(directory_path))
 
-def create_export_directory(directory_path: str) -> str:
+def create_export_directory(directory_path: str) -> Optional[str]:
     folder_name = get_folder_name(directory_path)
     export_dir_name = f"exported-from-{folder_name}"
     export_dir_path = os.path.join(directory_path, export_dir_name)
@@ -42,14 +42,6 @@ def create_export_directory(directory_path: str) -> str:
     except OSError as e:
         logging.error(f"Error creating export directory: {e}")
         return ""
-
-def export_tree_structure(directory_path: str) -> Optional[str]:
-    try:
-        logging.info("Exporting directory structure...")
-        return get_tree_structure(directory_path)
-    except Exception as e:
-        logging.error(f"Error generating tree structure: {e}")
-        return None
 
 def build_tag(tag: str, content: str, attributes: dict = None, self_closing: bool = False) -> str:
     """
@@ -96,6 +88,14 @@ def save_content(content: str, output_file: str, tag: str = "LogicalBlock", attr
         logging.error(f"Error writing to file: {e}")
         return False
 
+
+def export_tree_structure(directory_path: str) -> Optional[str]:
+    try:
+        logging.info("Exporting directory structure...")
+        return get_tree_structure(directory_path)
+    except Exception as e:
+        logging.error(f"Error generating tree structure: {e}")
+        return None
 
 def export_folder_contents(directory_path: str) -> Optional[str]:
     try:

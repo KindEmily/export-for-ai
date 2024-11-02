@@ -1,73 +1,106 @@
 import os
-import fnmatch
 import logging
+from pathspec import PathSpec
+from pathspec.patterns import GitWildMatchPattern
 
 DEFAULT_IGNORE_PATTERNS = [
-    '*.git*',
-    '__pycache__',
-    '*.pyc',
-    '*.pyo',
-    '*.pyd',
+    '__pycache__/',
+    '*.py[cod]',
+    '.DS_Store',
     '*.so',
-    '*.dll',
-    '*.exe',
-    '*.bin',
-    '*.obj',
-    '*.bak',
-    '*.tmp',
-    '*.swp',
-    '*.vscode',
-    '*.DS_Store',
-    'output',
-    'output/**',
-    'exported-from-*',
-    'exported-from-**',
-    '*.vs',
-    'bin',
-    'obj',
-    '*.idea',
-    '*.egg-info',
-    '*.egg-info/**',  # This will match all contents of egg-info directories
-    '*.png',
+    '.Python',
+    'build/',
+    'develop-eggs/',
+    'dist/',
+    'downloads/',
+    'eggs/',
+    '.eggs/',
+    'lib/',
+    'lib64/',
+    'parts/',
+    'sdist/',
+    'var/',
+    'wheels/',
+    '*.egg-info/',
+    '.installed.cfg',
+    '*.egg',
+    '*.manifest',
+    '*.spec',
+    'pip-log.txt',
+    'pip-delete-this-directory.txt',
+    'htmlcov/',
+    '.tox/',
+    '.coverage',
+    '.coverage.*',
+    'nosetests.xml',
+    'coverage.xml',
+    '*.cover',
+    '.hypothesis/',
+    '*.mo',
+    '*.pot',
+    '*.log',
+    'local_settings.py',
+    'instance/',
+    '.webassets-cache',
+    '.scrapy',
+    'docs/_build/',
+    'target/',
+    '.ipynb_checkpoints',
+    '.python-version',
+    'celerybeat-schedule',
+    '*.sage.py',
+    '.env',
+    '.venv',
+    'env/',
+    'venv/',
+    'ENV/',
+    '.spyderproject',
+    '.spyproject',
+    '.ropeproject',
+    '/site',
+    '.mypy_cache/',
+    '.vscode/',
+    '.idea/',
     '*.jpg',
     '*.jpeg',
-    '*.gif',
-    '*.bmp',
-    '*.tiff',
-    '*.webp',
-    '*.json',
-    '.csv',
-    '*.csv',
-    '.venv',
-    '*.log',
+    '*.png',
+    '*.svg',
     '*.md',
     '*.txt',
-    '.pytest_cache',
-    '*.pytest_cache',
-    '.pytest_cache/**',
+    '/output/',
+    '.bin/',
 ]
 
 def parse_ignore_file(directory):
-    ignore_patterns = DEFAULT_IGNORE_PATTERNS.copy()
+    """
+    Parses the .exportignore file and combines it with default ignore patterns.
+    
+    :param directory: The root directory of the project.
+    :return: A PathSpec object containing all ignore patterns.
+    """
     ignore_file_path = os.path.join(directory, '.exportignore')
+    patterns = DEFAULT_IGNORE_PATTERNS.copy()
     
     if os.path.exists(ignore_file_path):
         with open(ignore_file_path, 'r') as f:
             for line in f:
                 line = line.strip()
                 if line and not line.startswith('#'):
-                    ignore_patterns.append(line)
-        logging.info(f"Loaded {len(ignore_patterns)} ignore patterns from .exportignore")
+                    patterns.append(line)
+        logging.info(f"Loaded ignore patterns from .exportignore")
     else:
         logging.warning("No .exportignore file found. Using default exclusion rules.")
     
-    logging.debug(f"Final ignore patterns: {ignore_patterns}")
-    return ignore_patterns
+    spec = PathSpec.from_lines(GitWildMatchPattern, patterns)
+    logging.debug(f"Final ignore patterns: {patterns}")
+    return spec
 
-def should_include_item(item, ignore_patterns):
-    for pattern in ignore_patterns:
-        if fnmatch.fnmatch(item, pattern) or any(fnmatch.fnmatch(part, pattern) for part in item.split(os.sep)):
-            logging.debug(f"Ignoring {item} due to pattern {pattern}")
-            return False
-    logging.debug(f"Including {item}")
-    return True
+def should_include_item(item, spec):
+    """
+    Determines whether an item should be included based on ignore patterns.
+    
+    :param item: The relative path of the item.
+    :param spec: The PathSpec object containing ignore patterns.
+    :return: True if the item should be included, False otherwise.
+    """
+    return not spec.match_file(item)
