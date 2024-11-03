@@ -104,6 +104,34 @@ def export_folder_contents(directory_path: str) -> Optional[str]:
     except Exception as e:
         logging.error(f"Error exporting folder contents: {e}")
         return None
+    
+
+def export_project_md(tree_structure: str, folder_contents: str, export_dir: str) -> bool:
+    """
+    Combines the tree structure and folder contents into project.md.
+
+    :param tree_structure: The string representation of the tree structure.
+    :param folder_contents: The string representation of the folder contents.
+    :param export_dir: The directory where project.md will be saved.
+    :return: True if successful, False otherwise.
+    """
+    try:
+        content = (
+            "<SolutionTreeView>\n"
+            f"{tree_structure}\n"
+            "</SolutionTreeView>\n\n"
+            "<EntireSolutionCode>\n"
+            f"{folder_contents}\n"
+            "</EntireSolutionCode>\n"
+        )
+        project_md_path = os.path.join(export_dir, "project.md")
+        with open(project_md_path, "w", encoding="utf-8") as f:
+            f.write(content)
+        logging.info(f"Project.md exported to {project_md_path}")
+        return True
+    except Exception as e:
+        logging.error(f"Error exporting project.md: {e}")
+        return False
 
 def main() -> None:
     setup_logging()
@@ -133,12 +161,18 @@ def main() -> None:
         if not save_content(folder_contents, folder_output_file, tag="EntireSolutionCode"):
             return
 
+    # Generate project.md combining tree and code
+    if tree_structure and folder_contents:
+        if not export_project_md(tree_structure, folder_contents, export_dir):
+            return
+
     # Create README.md
     readme_content = create_readme(get_folder_name(directory_path))
     if not save_content(readme_content, os.path.join(export_dir, "README.md")):
         return
 
     logging.info(f"Export completed successfully. Files saved in {export_dir}")
+
 
 if __name__ == "__main__":
     main()
