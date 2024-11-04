@@ -1,0 +1,19 @@
+# File: config.yaml
+
+project_details: |
+  ### Project Details
+
+  This section provides detailed information about the project.
+
+  - **Objective**: Describe the primary objective.
+  - **Scope**: Outline the scope of the project.
+  - **Technologies Used**: List the technologies involved.
+  - **Team Members**: Mention the team members and their roles.
+
+additional_info: |
+  ### Additional Information
+
+  This section provides extra details about the project.
+
+  - **Feature A**: Description of Feature A.
+  - **Feature B**: Description of Feature B.

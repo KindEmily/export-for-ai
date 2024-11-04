@@ -1,6 +1,6 @@
 [tool.poetry]
 name = "export-for-ai"
-version = "0.1.6"
+version = "0.2.0"
 description = ""
 authors = ["KindEmily <evlasiuk@asclepyus.com>"]
 readme = "README.md"
@@ -12,6 +12,7 @@ packages = [
 python = "^3.10"
 pathspec = "^0.12.1"
 anytree = "^2.12.1"
+pyyaml = "^6.0.2"
 
 [tool.poetry.group.dev.dependencies]
 anytree = "^2.12.1"

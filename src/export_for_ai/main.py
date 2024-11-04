@@ -106,9 +106,25 @@ def export_folder_contents(directory_path: str) -> Optional[str]:
         return None
     
 
+# File: src/export_for_ai/main.py
+
+import os
+import logging
+from typing import Optional
+
+from export_for_ai.tree_visualizer import get_tree_structure
+from export_for_ai.folder_exporter import export_folder_content
+from export_for_ai.readme_generator import create_readme
+from export_for_ai.section_manager import section_manager  # Import the section manager
+
+import re
+import html
+
+# ... (rest of the imports and existing code)
+
 def export_project_md(tree_structure: str, folder_contents: str, export_dir: str) -> bool:
     """
-    Combines the tree structure and folder contents into project.md.
+    Combines the dynamically added sections, tree structure, and folder contents into project.md.
 
     :param tree_structure: The string representation of the tree structure.
     :param folder_contents: The string representation of the folder contents.
@@ -116,7 +132,11 @@ def export_project_md(tree_structure: str, folder_contents: str, export_dir: str
     :return: True if successful, False otherwise.
     """
     try:
+        # Get dynamically added sections
+        dynamic_sections = section_manager.get_sections_content()
+
         content = (
+            f"{dynamic_sections}"
             "<SolutionTreeView>\n"
             f"{tree_structure}\n"
             "</SolutionTreeView>\n\n"
@@ -133,6 +153,21 @@ def export_project_md(tree_structure: str, folder_contents: str, export_dir: str
         logging.error(f"Error exporting project.md: {e}")
         return False
 
+
+# File: src/export_for_ai/main.py
+
+# ... (existing imports)
+
+from export_for_ai.section_manager import section_manager  # Ensure this is imported
+
+def load_config(config_path: str) -> dict:
+    try:
+        with open(config_path, 'r', encoding='utf-8') as f:
+            return yaml.safe_load(f)
+    except Exception as e:
+        logging.error(f"Error loading config file: {e}")
+        return {}
+
 def main() -> None:
     setup_logging()
 
@@ -146,6 +181,38 @@ def main() -> None:
     export_dir = create_export_directory(directory_path)
     if not export_dir:
         return
+
+    # Load section contents from config.yaml
+    config = load_config(os.path.join(directory_path, "config.yaml"))
+    if config:
+        for block_name, block_content in config.items():
+            # Convert snake_case to CamelCase for block names if necessary
+            formatted_block_name = ''.join(word.capitalize() for word in block_name.split('_'))
+            section_manager.add_section(formatted_block_name, block_content)
+    else:
+        # Fallback to default sections if config is not available or empty
+        section_manager.add_section(
+            "CurrentGoal",
+            "### Current Goal\n\nYour current goal description goes here.\nIt can span multiple lines."
+        )
+
+        section_manager.add_section(
+            "MainGoal",
+            "### Main Goal\n\nYour main goal description goes here.\nIt can span multiple lines."
+        )
+
+        section_manager.add_section(
+            "ProjectDetails",
+            """### Project Details
+
+This section provides detailed information about the project.
+
+- **Objective**: Describe the primary objective.
+- **Scope**: Outline the scope of the project.
+- **Technologies Used**: List the technologies involved.
+- **Team Members**: Mention the team members and their roles.
+"""
+        )
 
     # Export Directory Structure
     tree_structure = export_tree_structure(directory_path)
@@ -161,7 +228,7 @@ def main() -> None:
         if not save_content(folder_contents, folder_output_file, tag="EntireSolutionCode"):
             return
 
-    # Generate project.md combining tree and code
+    # Generate project.md combining tree and code with dynamic sections
     if tree_structure and folder_contents:
         if not export_project_md(tree_structure, folder_contents, export_dir):
             return
@@ -172,7 +239,6 @@ def main() -> None:
         return
 
     logging.info(f"Export completed successfully. Files saved in {export_dir}")
-
 
 if __name__ == "__main__":
     main()
