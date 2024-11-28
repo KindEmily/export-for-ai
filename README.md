@@ -1,22 +1,44 @@
-# export-for-ai
+# export-for-ai (v0.3.0)
 ![usage gif](https://github.com/KindEmily/export-for-ai/blob/main/demo/export-for-ai-usage.gif?raw=true)
 
 ## Why this tool? 
-THis is a tool to export data for AI processing into services like ChatGPT or Claude.ai. 
+This is a tool to export data for AI processing into services like ChatGPT or Claude.ai. 
 Just export, drag and drop to the context.
 
+## Installation
+
+1. Install Poetry (if not already installed):
+```bash
+pip install poetry
 ```
-cd C:\Users\probl\Work\ExampleFolder\awesome-app
-export-for-ai C:\Users\probl\Work\ExampleFolder\
-``` 
+2. Install the package:
+```bash
+# Clone the repository
+git clone https://github.com/KindEmily/export-for-ai.git
+cd export-for-ai
 
-# To use this:
+# Install dependencies and the package
+poetry install
 
+# Build the package
+poetry build
 
-Run pip install -e . in the directory containing setup.py to install your package in editable mode.
+# Install the built package
+pip install dist/<new-build-name>.whl
+```
+## Usage
 
-You should then be able to run `export-for-ai` from the command line, which will execute the `main() function in `src/export_for_ai/main.py`.`
-
+```bash
+export-for-ai <directory_path>
+```
+Example:
+```bash
+export-for-ai C:\Users\username\MyProject
+```
+This will create a new directory named "exported-from-MyProject" containing:
+- project.md with your project's structure and contents
+- A comprehensive tree view of your project
+- Properly formatted and minified code{{ ... }}
 
 ----
 
@@ -65,7 +87,7 @@ Below are some examples of how to specify patterns in your `.exportignore` file 
 To exclude a folder and all its contents, add the folder name followed by a slash:
 
 ```
-node_modules/**
+node_modules/
 ```
 
 This pattern will exclude the `node_modules` directory and everything inside it from the export.
