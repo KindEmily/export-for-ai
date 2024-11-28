@@ -1,4 +1,4 @@
-# export-for-ai (v0.3.1)
+# export-for-ai 
 ![usage gif](https://github.com/KindEmily/export-for-ai/blob/main/demo/export-for-ai-usage.gif?raw=true)
 
 ## Why this tool? 
