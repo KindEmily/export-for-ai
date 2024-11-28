@@ -1,18 +1,19 @@
-# main.py 
-import sys
-import os
+# main.py
+import html
 import logging
+import os
+import re
+import sys
 from typing import Optional
 
-from export_for_ai.tree_visualizer import get_tree_structure
-from export_for_ai.folder_exporter import export_folder_content
+from export_for_ai.folder_exporter import export_folder_content, minify_code
 from export_for_ai.readme_generator import create_readme
+from export_for_ai.tree_visualizer import get_tree_structure
 
-import re
-import html
 
 def setup_logging() -> None:
-    logging.basicConfig(level=logging.DEBUG, format='%(levelname)s: %(message)s')
+    logging.basicConfig(level=logging.DEBUG, format="%(levelname)s: %(message)s")
+
 
 def parse_arguments() -> Optional[str]:
     if len(sys.argv) != 2:
@@ -21,20 +22,23 @@ def parse_arguments() -> Optional[str]:
 
     return os.path.abspath(sys.argv[1])
 
+
 def validate_directory(directory_path: str) -> bool:
     if not os.path.isdir(directory_path):
         logging.error(f"Error: '{directory_path}' is not a valid directory")
         return False
     return True
 
+
 def get_folder_name(directory_path: str) -> str:
     return os.path.basename(os.path.abspath(directory_path))
+
 
 def create_export_directory(directory_path: str) -> Optional[str]:
     folder_name = get_folder_name(directory_path)
     export_dir_name = f"exported-from-{folder_name}"
     export_dir_path = os.path.join(directory_path, export_dir_name)
-    
+
     try:
         os.makedirs(export_dir_path, exist_ok=True)
         logging.info(f"Created export directory: {export_dir_path}")
@@ -43,7 +47,10 @@ def create_export_directory(directory_path: str) -> Optional[str]:
         logging.error(f"Error creating export directory: {e}")
         return ""
 
-def build_tag(tag: str, content: str, attributes: dict = None, self_closing: bool = False) -> str:
+
+def build_tag(
+    tag: str, content: str, attributes: dict = None, self_closing: bool = False
+) -> str:
     """
     Builds an XML/HTML-like tag with optional attributes and content.
 
@@ -54,12 +61,15 @@ def build_tag(tag: str, content: str, attributes: dict = None, self_closing: boo
     :return: The constructed tag as a string.
     """
     # Validate tag name (simple regex for tag names)
-    if not re.match(r'^[A-Za-z_][A-Za-z0-9_.-]*$', tag):
+    if not re.match(r"^[A-Za-z_][A-Za-z0-9_.-]*$", tag):
         raise ValueError(f"Invalid tag name: {tag}")
 
-    attrs = ''
+    attrs = ""
     if attributes:
-        attrs = ' ' + ' '.join(f'{key}="{html.escape(str(value), quote=True)}"' for key, value in attributes.items())
+        attrs = " " + " ".join(
+            f'{key}="{html.escape(str(value), quote=True)}"'
+            for key, value in attributes.items()
+        )
 
     if self_closing:
         return f"<{tag}{attrs} />"
@@ -67,7 +77,10 @@ def build_tag(tag: str, content: str, attributes: dict = None, self_closing: boo
         escaped_content = html.escape(content)
         return f"<{tag}{attrs}>\n\n{escaped_content}\n\n</{tag}>"
 
-def save_content(content: str, output_file: str, tag: str = "LogicalBlock", attributes: dict = None) -> bool:
+
+def save_content(
+    content: str, output_file: str, tag: str = "LogicalBlock", attributes: dict = None
+) -> bool:
     """
     Saves the content wrapped in a specified tag to an output file.
 
@@ -78,7 +91,9 @@ def save_content(content: str, output_file: str, tag: str = "LogicalBlock", attr
     :return: True if successful, False otherwise.
     """
     try:
-        wrapped_content = build_tag(tag, content, attributes)
+        minify = minify_code(content)
+
+        wrapped_content = build_tag(tag, minify, attributes)
 
         with open(output_file, "w", encoding="utf-8") as f:
             f.write(wrapped_content)
@@ -97,6 +112,7 @@ def export_tree_structure(directory_path: str) -> Optional[str]:
         logging.error(f"Error generating tree structure: {e}")
         return None
 
+
 def export_folder_contents(directory_path: str) -> Optional[str]:
     try:
         logging.info("Exporting folder contents...")
@@ -104,25 +120,20 @@ def export_folder_contents(directory_path: str) -> Optional[str]:
     except Exception as e:
         logging.error(f"Error exporting folder contents: {e}")
         return None
-    
+
 
 # File: src/export_for_ai/main.py
 
-import os
-import logging
 from typing import Optional
 
-from export_for_ai.tree_visualizer import get_tree_structure
-from export_for_ai.folder_exporter import export_folder_content
-from export_for_ai.readme_generator import create_readme
 from export_for_ai.section_manager import section_manager  # Import the section manager
-
-import re
-import html
 
 # ... (rest of the imports and existing code)
 
-def export_project_md(tree_structure: str, folder_contents: str, export_dir: str) -> bool:
+
+def export_project_md(
+    tree_structure: str, folder_contents: str, export_dir: str
+) -> bool:
     """
     Combines the dynamically added sections, tree structure, and folder contents into project.md.
 
@@ -158,15 +169,15 @@ def export_project_md(tree_structure: str, folder_contents: str, export_dir: str
 
 # ... (existing imports)
 
-from export_for_ai.section_manager import section_manager  # Ensure this is imported
 
 def load_config(config_path: str) -> dict:
     try:
-        with open(config_path, 'r', encoding='utf-8') as f:
+        with open(config_path, "r", encoding="utf-8") as f:
             return yaml.safe_load(f)
     except Exception as e:
         logging.error(f"Error loading config file: {e}")
         return {}
+
 
 def main() -> None:
     setup_logging()
@@ -187,31 +198,33 @@ def main() -> None:
     if config:
         for block_name, block_content in config.items():
             # Convert snake_case to CamelCase for block names if necessary
-            formatted_block_name = ''.join(word.capitalize() for word in block_name.split('_'))
+            formatted_block_name = "".join(
+                word.capitalize() for word in block_name.split("_")
+            )
             section_manager.add_section(formatted_block_name, block_content)
     else:
         # Fallback to default sections if config is not available or empty
         section_manager.add_section(
             "CurrentGoal",
-            "### Current Goal\n\nYour current goal description goes here.\nIt can span multiple lines."
+            "### Current Goal\n\nYour current goal description goes here.\nIt can span multiple lines.",
         )
 
         section_manager.add_section(
             "MainGoal",
-            "### Main Goal\n\nYour main goal description goes here.\nIt can span multiple lines."
+            "### Main Goal\n\nYour main goal description goes here.\nIt can span multiple lines.",
         )
 
         section_manager.add_section(
             "ProjectDetails",
             """### Project Details
 
-This section provides detailed information about the project.
+            This section provides detailed information about the project.
 
-- **Objective**: Describe the primary objective.
-- **Scope**: Outline the scope of the project.
-- **Technologies Used**: List the technologies involved.
-- **Team Members**: Mention the team members and their roles.
-"""
+            - **Objective**: Describe the primary objective.
+            - **Scope**: Outline the scope of the project.
+            - **Technologies Used**: List the technologies involved.
+            - **Team Members**: Mention the team members and their roles.
+            """,
         )
 
     # Export Directory Structure
@@ -225,7 +238,9 @@ This section provides detailed information about the project.
     folder_contents = export_folder_contents(directory_path)
     if folder_contents:
         folder_output_file = os.path.join(export_dir, "project_contents.md")
-        if not save_content(folder_contents, folder_output_file, tag="EntireSolutionCode"):
+        if not save_content(
+            folder_contents, folder_output_file, tag="EntireSolutionCode"
+        ):
             return
 
     # Generate project.md combining tree and code with dynamic sections
@@ -239,6 +254,7 @@ This section provides detailed information about the project.
         return
 
     logging.info(f"Export completed successfully. Files saved in {export_dir}")
+
 
 if __name__ == "__main__":
     main()
