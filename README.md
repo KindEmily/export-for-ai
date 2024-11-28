@@ -1,31 +1,89 @@
-# export-for-ai (v0.3.0)
+# export-for-ai (v0.3.1)
 ![usage gif](https://github.com/KindEmily/export-for-ai/blob/main/demo/export-for-ai-usage.gif?raw=true)
 
 ## Why this tool? 
 This is a tool to export data for AI processing into services like ChatGPT or Claude.ai. 
 Just export, drag and drop to the context.
 
-## Installation
+## Installation Guide 
 
-1. Install Poetry (if not already installed):
-```bash
-pip install poetry
+### Step 1: Check Your Python Installation
+1. Open Command Prompt (CMD)
+2. Type this command to check if Python is installed:
+   ```cmd
+   python --version
+   ```
+   You should see something like `Python 3.10.x`
+
+### Step 2: Install the Package
+1. Clone the repository:
+   ```cmd
+   git clone https://github.com/KindEmily/export-for-ai.git
+   cd export-for-ai
+   ```
+
+2. Install in development mode:
+   ```cmd
+   python -m pip install -e .
+   ```
+
+3. Verify the installation:
+   ```cmd
+   python -m pip show export-for-ai
+   ```
+   You should see the package information including the version number.
+
+### Step 3: Test the Installation
+Try running:
+```cmd
+export-for-ai --help
 ```
-2. Install the package:
-```bash
-# Clone the repository
-git clone https://github.com/KindEmily/export-for-ai.git
-cd export-for-ai
 
-# Install dependencies and the package
-poetry install
+## How to Update to New Versions
 
-# Build the package
-poetry build
+When a new version is released, follow these steps:
 
-# Install the built package
-pip install dist/<new-build-name>.whl
-```
+1. Go to the package directory:
+   ```cmd
+   cd export-for-ai
+   ```
+
+2. Get the latest code:
+   ```cmd
+   git pull origin main
+   ```
+
+3. Reinstall the package:
+   ```cmd
+   python -m pip install -e .
+   ```
+
+4. Verify the update:
+   ```cmd
+   python -m pip show export-for-ai
+   ```
+   Check that the version number matches the latest version.
+
+## Troubleshooting
+
+If you see an old version after updating:
+1. Close all Command Prompt windows
+2. Open a new Command Prompt
+3. Check the version again:
+   ```cmd
+   python -m pip show export-for-ai
+   ```
+
+If you have multiple Python versions installed and want to make sure you're using the right one:
+1. Find your Python installation:
+   ```cmd
+   where python
+   ```
+2. Use the full path to Python:
+   ```cmd
+   C:\Users\YourUsername\AppData\Local\Programs\Python\Python310\python.exe -m pip install -e .
+   ```
+
 ## Usage
 
 ```bash
@@ -38,7 +96,7 @@ export-for-ai C:\Users\username\MyProject
 This will create a new directory named "exported-from-MyProject" containing:
 - project.md with your project's structure and contents
 - A comprehensive tree view of your project
-- Properly formatted and minified code{{ ... }}
+- Properly formatted and minified code
 
 ----
 
