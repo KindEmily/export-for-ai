@@ -39,6 +39,9 @@ Try running:
 export-for-ai --help
 ```
 
+![how to use](https://github.com/KindEmily/export-for-ai/blob/main/demo/how-to-install-or-update.png?raw=true)
+
+
 ## How to Update to New Versions
 
 When a new version is released, follow these steps:
