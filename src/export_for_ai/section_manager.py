@@ -29,7 +29,7 @@ class SectionManager:
                 return
         raise ValueError(f"Block '{block_name}' not found.")
     
-    def get_sections_content(self) -> str:
+    def get_sections_content(self, openOperator = "<", closeOperator = ">") -> str:
         """
         Generates the combined string of all sections.
 
@@ -37,7 +37,7 @@ class SectionManager:
         """
         content = ""
         for block_name, block_content in self.sections:
-            content += f"<{block_name}>\n\n{block_content}\n\n</{block_name}>\n\n"
+            content += f"{openOperator}{block_name}{closeOperator}\n\n{block_content}\n\n{openOperator}/{block_name}{closeOperator}\n\n"
         return content
 
 # Initialize a global SectionManager instance

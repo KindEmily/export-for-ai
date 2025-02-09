@@ -144,16 +144,52 @@ def export_project_md(
     """
     try:
         # Get dynamically added sections
-        dynamic_sections = section_manager.get_sections_content()
+        dynamic_sections = """
+# The goal
+Our goal is to generate code and/or instructions to:
+
+# Core Design Philosophy
+
+Seek a most minimal, simple, fewest LOC, lowest complexity design plans or paths to the required functionality. Preserve the robust, clutter-free design, and avoid any code, features, or decorations that do not directly contribute to the strictly essential functionality. It must be raw, and should aim to retain most or all existing functionality, unless the task is to, or requires that you, remove it. Aim to avoid creating divergent code pathways, and instead seek unified routes without branching where possible. Don't attempt to improvise, innovate, make unspecified improvements or changes, or move outside the scope of your specified task. Do not blindy follow the task instructions and analysis. Verify for yourself that the conclusions are accurate, and will not cause unanticipated side effects.
+
+# Creating components
+
+### Requirement:
+If not done - Create api model layer `apiModel`
+If not done - Adjust api  layer `apiModel` for cqrs mediator pattern
+
+### Requirement:
+If missing - Implement CQRS with commands and queries
+If missing - Map `apiModel` to the CQRS command or query and pass data to lower layers
+If missing - Implement CQRS handlers logic
+
+### Requirement:
+CQRS handlers returns `domainModel` layer which would be mapped into the `apiModel` at the endpoint (api layer).
+
+### Requirement:
+Leverages existing libraries when possible to minimize manual implementation.
+
+### Requirement:
+Use already existing implementation when possible.
+
+### Requirement:
+Create reusable code and reuse existing code.
+
+### Requirement:
+Implement abstractions like base classes and common interfaces.
+
+### Requirement:
+Utilize the best libraries to minimize manual coding
+        """
 
         content = (
-            f"{dynamic_sections}"
-            "<SolutionTreeView>\n"
-            f"{tree_structure}\n"
-            "</SolutionTreeView>\n\n"
-            "<EntireSolutionCode>\n"
-            f"{folder_contents}\n"
-            "</EntireSolutionCode>\n"
+f"{dynamic_sections}"
+"\n\n# SolutionTreeView \n```\n"
+f"{tree_structure}\n"
+"```\n\n"
+"\n\n# Entire Solution Code start \n"
+f"{folder_contents}\n"
+"# EntireSolution Code end \n"
         )
         project_md_path = os.path.join(export_dir, "project.md")
         with open(project_md_path, "w", encoding="utf-8") as f:
@@ -163,11 +199,6 @@ def export_project_md(
     except Exception as e:
         logging.error(f"Error exporting project.md: {e}")
         return False
-
-
-# File: src/export_for_ai/main.py
-
-# ... (existing imports)
 
 
 def load_config(config_path: str) -> dict:
@@ -194,38 +225,7 @@ def main() -> None:
         return
 
     # Load section contents from config.yaml
-    config = load_config(os.path.join(directory_path, "config.yaml"))
-    if config:
-        for block_name, block_content in config.items():
-            # Convert snake_case to CamelCase for block names if necessary
-            formatted_block_name = "".join(
-                word.capitalize() for word in block_name.split("_")
-            )
-            section_manager.add_section(formatted_block_name, block_content)
-    else:
-        # Fallback to default sections if config is not available or empty
-        section_manager.add_section(
-            "CurrentGoal",
-            "### Current Goal\n\nYour current goal description goes here.\nIt can span multiple lines.",
-        )
-
-        section_manager.add_section(
-            "MainGoal",
-            "### Main Goal\n\nYour main goal description goes here.\nIt can span multiple lines.",
-        )
-
-        section_manager.add_section(
-            "ProjectDetails",
-            """### Project Details
-
-            This section provides detailed information about the project.
-
-            - **Objective**: Describe the primary objective.
-            - **Scope**: Outline the scope of the project.
-            - **Technologies Used**: List the technologies involved.
-            - **Team Members**: Mention the team members and their roles.
-            """,
-        )
+    # Skipped
 
     # Export Directory Structure
     tree_structure = export_tree_structure(directory_path)
@@ -247,11 +247,6 @@ def main() -> None:
     if tree_structure and folder_contents:
         if not export_project_md(tree_structure, folder_contents, export_dir):
             return
-
-    # Create README.md
-    readme_content = create_readme(get_folder_name(directory_path))
-    if not save_content(readme_content, os.path.join(export_dir, "README.md")):
-        return
 
     logging.info(f"Export completed successfully. Files saved in {export_dir}")
 
