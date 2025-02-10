@@ -5,6 +5,8 @@ import os
 import re
 import sys
 from typing import Optional
+import pyperclip
+import yaml
 
 from export_for_ai.folder_exporter import export_folder_content, minify_code
 from export_for_ai.readme_generator import create_readme
@@ -136,6 +138,7 @@ def export_project_md(
 ) -> bool:
     """
     Combines the dynamically added sections, tree structure, and folder contents into project.md.
+    Also copies the content to system clipboard.
 
     :param tree_structure: The string representation of the tree structure.
     :param folder_contents: The string representation of the folder contents.
@@ -195,6 +198,14 @@ f"{folder_contents}\n"
         with open(project_md_path, "w", encoding="utf-8") as f:
             f.write(content)
         logging.info(f"Project.md exported to {project_md_path}")
+        
+        # Copy content to clipboard
+        try:
+            pyperclip.copy(content)
+            logging.info("Content successfully copied to clipboard")
+        except Exception as e:
+            logging.warning(f"Could not copy to clipboard: {e}")
+            
         return True
     except Exception as e:
         logging.error(f"Error exporting project.md: {e}")
