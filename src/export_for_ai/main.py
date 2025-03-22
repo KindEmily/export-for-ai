@@ -149,7 +149,7 @@ def export_project_md(
 # The goal
 
 # Core Design Philosophy
-Seek a most minimal, simple, fewest LOC, lowest complexity design plans or paths to the required functionality. Preserve the robust, clutter-free design, and avoid any code, features, or decorations that do not directly contribute to the strictly essential functionality. It must be raw, and should aim to retain most or all existing functionality, unless the task is to, or requires that you, remove it. Aim to avoid creating divergent code pathways, and instead seek unified routes without branching where possible. Don't attempt to improvise, innovate, make unspecified improvements or changes, or move outside the scope of your specified task. Do not blindy follow the task instructions and analysis. Verify for yourself that the conclusions are accurate, and will not cause unanticipated side effects.
+Seek a most minimal, simple, fewest LOC, lowest complexity design plans or paths to the required functionality. Preserve the robust, clutter-free design, and avoid any code, features, or decorations that do not directly contribute to the strictly essential functionality. It must be raw, and should aim to retain most or all existing functionality, unless the task is to, or requires that you, remove it. Aim to avoid creating divergent code pathways, and instead seek unified routes without branching where possible. Don't attempt to improvise, innovate, make unspecified improvements or changes, or move outside the scope of your specified task. Do not blindly follow the task instructions and analysis. Verify for yourself that the conclusions are accurate, and will not cause unanticipated side effects.
 
 ### Requirement:
 Leverages existing libraries when possible to minimize manual implementation.
