@@ -5,11 +5,11 @@ import os
 import re
 import sys
 from typing import Optional
+
 import pyperclip
 import yaml
 
 from export_for_ai.folder_exporter import export_folder_content, minify_code
-from export_for_ai.readme_generator import create_readme
 from export_for_ai.tree_visualizer import get_tree_structure
 
 
@@ -51,7 +51,7 @@ def create_export_directory(directory_path: str) -> Optional[str]:
 
 
 def build_tag(
-    tag: str, content: str, attributes: dict = None, self_closing: bool = False
+        tag: str, content: str, attributes: dict = None, self_closing: bool = False
 ) -> str:
     """
     Builds an XML/HTML-like tag with optional attributes and content.
@@ -81,7 +81,7 @@ def build_tag(
 
 
 def save_content(
-    content: str, output_file: str, tag: str = "LogicalBlock", attributes: dict = None
+        content: str, output_file: str, tag: str = "LogicalBlock", attributes: dict = None
 ) -> bool:
     """
     Saves the content wrapped in a specified tag to an output file.
@@ -126,15 +126,11 @@ def export_folder_contents(directory_path: str) -> Optional[str]:
 
 # File: src/export_for_ai/main.py
 
-from typing import Optional
-
-from export_for_ai.section_manager import section_manager  # Import the section manager
-
 # ... (rest of the imports and existing code)
 
 
 def export_project_md(
-    tree_structure: str, folder_contents: str, export_dir: str
+        tree_structure: str, folder_contents: str, export_dir: str
 ) -> bool:
     """
     Combines the dynamically added sections, tree structure, and folder contents into project.md.
@@ -186,26 +182,26 @@ Utilize the best libraries to minimize manual coding
         """
 
         content = (
-f"{dynamic_sections}"
-"\n\n# SolutionTreeView \n```\n"
-f"{tree_structure}\n"
-"```\n\n"
-"\n\n# Entire Solution Code start \n"
-f"{folder_contents}\n"
-"# EntireSolution Code end \n"
+            f"{dynamic_sections}"
+            "\n\n# SolutionTreeView \n```\n"
+            f"{tree_structure}\n"
+            "```\n\n"
+            "\n\n# Entire Solution Code start \n"
+            f"{folder_contents}\n"
+            "# EntireSolution Code end \n"
         )
         project_md_path = os.path.join(export_dir, "project.md")
         with open(project_md_path, "w", encoding="utf-8") as f:
             f.write(content)
         logging.info(f"Project.md exported to {project_md_path}")
-        
+
         # Copy content to clipboard
         try:
             pyperclip.copy(content)
             logging.info("Content successfully copied to clipboard")
         except Exception as e:
             logging.warning(f"Could not copy to clipboard: {e}")
-            
+
         return True
     except Exception as e:
         logging.error(f"Error exporting project.md: {e}")
@@ -250,7 +246,7 @@ def main() -> None:
     if folder_contents:
         folder_output_file = os.path.join(export_dir, "project_contents.md")
         if not save_content(
-            folder_contents, folder_output_file, tag="EntireSolutionCode"
+                folder_contents, folder_output_file, tag="EntireSolutionCode"
         ):
             return
 
