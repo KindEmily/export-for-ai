@@ -144,26 +144,12 @@ def export_project_md(
     try:
         # Get dynamically added sections
         dynamic_sections = """
+# Previous step 
+
 # The goal
-Our goal is to generate code and/or instructions to:
 
 # Core Design Philosophy
-
 Seek a most minimal, simple, fewest LOC, lowest complexity design plans or paths to the required functionality. Preserve the robust, clutter-free design, and avoid any code, features, or decorations that do not directly contribute to the strictly essential functionality. It must be raw, and should aim to retain most or all existing functionality, unless the task is to, or requires that you, remove it. Aim to avoid creating divergent code pathways, and instead seek unified routes without branching where possible. Don't attempt to improvise, innovate, make unspecified improvements or changes, or move outside the scope of your specified task. Do not blindy follow the task instructions and analysis. Verify for yourself that the conclusions are accurate, and will not cause unanticipated side effects.
-
-# Creating components
-
-### Requirement:
-If not done - Create api model layer `apiModel`
-If not done - Adjust api  layer `apiModel` for cqrs mediator pattern
-
-### Requirement:
-If missing - Implement CQRS with commands and queries
-If missing - Map `apiModel` to the CQRS command or query and pass data to lower layers
-If missing - Implement CQRS handlers logic
-
-### Requirement:
-CQRS handlers returns `domainModel` layer which would be mapped into the `apiModel` at the endpoint (api layer).
 
 ### Requirement:
 Leverages existing libraries when possible to minimize manual implementation.
