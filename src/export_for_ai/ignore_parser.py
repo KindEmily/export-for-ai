@@ -19,7 +19,6 @@ DEFAULT_IGNORE_PATTERNS = [
     'downloads/',
     'eggs/',
     '.eggs/',
-    'lib/',
     'lib64/',
     'parts/',
     'sdist/',

@@ -5,11 +5,11 @@ import os
 import re
 import sys
 from typing import Optional
+
 import pyperclip
 import yaml
 
 from export_for_ai.folder_exporter import export_folder_content, minify_code
-from export_for_ai.readme_generator import create_readme
 from export_for_ai.tree_visualizer import get_tree_structure
 
 
@@ -51,7 +51,7 @@ def create_export_directory(directory_path: str) -> Optional[str]:
 
 
 def build_tag(
-    tag: str, content: str, attributes: dict = None, self_closing: bool = False
+        tag: str, content: str, attributes: dict = None, self_closing: bool = False
 ) -> str:
     """
     Builds an XML/HTML-like tag with optional attributes and content.
@@ -81,7 +81,7 @@ def build_tag(
 
 
 def save_content(
-    content: str, output_file: str, tag: str = "LogicalBlock", attributes: dict = None
+        content: str, output_file: str, tag: str = "LogicalBlock", attributes: dict = None
 ) -> bool:
     """
     Saves the content wrapped in a specified tag to an output file.
@@ -126,15 +126,11 @@ def export_folder_contents(directory_path: str) -> Optional[str]:
 
 # File: src/export_for_ai/main.py
 
-from typing import Optional
-
-from export_for_ai.section_manager import section_manager  # Import the section manager
-
 # ... (rest of the imports and existing code)
 
 
 def export_project_md(
-    tree_structure: str, folder_contents: str, export_dir: str
+        tree_structure: str, folder_contents: str, export_dir: str
 ) -> bool:
     """
     Combines the dynamically added sections, tree structure, and folder contents into project.md.
@@ -148,26 +144,12 @@ def export_project_md(
     try:
         # Get dynamically added sections
         dynamic_sections = """
+# Previous step 
+
 # The goal
-Our goal is to generate code and/or instructions to:
 
 # Core Design Philosophy
-
 Seek a most minimal, simple, fewest LOC, lowest complexity design plans or paths to the required functionality. Preserve the robust, clutter-free design, and avoid any code, features, or decorations that do not directly contribute to the strictly essential functionality. It must be raw, and should aim to retain most or all existing functionality, unless the task is to, or requires that you, remove it. Aim to avoid creating divergent code pathways, and instead seek unified routes without branching where possible. Don't attempt to improvise, innovate, make unspecified improvements or changes, or move outside the scope of your specified task. Do not blindy follow the task instructions and analysis. Verify for yourself that the conclusions are accurate, and will not cause unanticipated side effects.
-
-# Creating components
-
-### Requirement:
-If not done - Create api model layer `apiModel`
-If not done - Adjust api  layer `apiModel` for cqrs mediator pattern
-
-### Requirement:
-If missing - Implement CQRS with commands and queries
-If missing - Map `apiModel` to the CQRS command or query and pass data to lower layers
-If missing - Implement CQRS handlers logic
-
-### Requirement:
-CQRS handlers returns `domainModel` layer which would be mapped into the `apiModel` at the endpoint (api layer).
 
 ### Requirement:
 Leverages existing libraries when possible to minimize manual implementation.
@@ -186,26 +168,26 @@ Utilize the best libraries to minimize manual coding
         """
 
         content = (
-f"{dynamic_sections}"
-"\n\n# SolutionTreeView \n```\n"
-f"{tree_structure}\n"
-"```\n\n"
-"\n\n# Entire Solution Code start \n"
-f"{folder_contents}\n"
-"# EntireSolution Code end \n"
+            f"{dynamic_sections}"
+            "\n\n# SolutionTreeView \n```\n"
+            f"{tree_structure}\n"
+            "```\n\n"
+            "\n\n# Entire Solution Code start \n"
+            f"{folder_contents}\n"
+            "# EntireSolution Code end \n"
         )
         project_md_path = os.path.join(export_dir, "project.md")
         with open(project_md_path, "w", encoding="utf-8") as f:
             f.write(content)
         logging.info(f"Project.md exported to {project_md_path}")
-        
+
         # Copy content to clipboard
         try:
             pyperclip.copy(content)
             logging.info("Content successfully copied to clipboard")
         except Exception as e:
             logging.warning(f"Could not copy to clipboard: {e}")
-            
+
         return True
     except Exception as e:
         logging.error(f"Error exporting project.md: {e}")
@@ -250,7 +232,7 @@ def main() -> None:
     if folder_contents:
         folder_output_file = os.path.join(export_dir, "project_contents.md")
         if not save_content(
-            folder_contents, folder_output_file, tag="EntireSolutionCode"
+                folder_contents, folder_output_file, tag="EntireSolutionCode"
         ):
             return
 
