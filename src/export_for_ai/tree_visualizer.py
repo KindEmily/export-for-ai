@@ -40,15 +40,17 @@ def build_tree(path, root_path, spec):
     add_children(path, root_node)
     return root_node
 
-def get_tree_structure(path):
+def get_tree_structure(path: str, template_name: str = "default") -> str:
     """
     Generate a string representation of the folder structure.
     
     :param path: The root directory path.
+    :param template_name: The name of the ignore pattern template to use.
     :return: A string representing the tree structure.
     """
-    spec = parse_ignore_file(path)
-    tree = build_tree(path, path, spec)
+    logging.info(f"Generating tree structure for '{path}' using template '{template_name}'")
+    spec = parse_ignore_file(path, template_name=template_name)
+    tree = build_tree(path, path, spec) # spec is now correctly initialized with template
     tree_lines = []
     for pre, _, node in RenderTree(tree):
         tree_lines.append(pre + node.name)

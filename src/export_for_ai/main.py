@@ -11,18 +11,87 @@ import yaml
 
 from export_for_ai.folder_exporter import export_folder_content, minify_code
 from export_for_ai.tree_visualizer import get_tree_structure
+from export_for_ai.ignore_generator import generate_exportignore
 
 
 def setup_logging() -> None:
     logging.basicConfig(level=logging.DEBUG, format="%(levelname)s: %(message)s")
 
 
-def parse_arguments() -> Optional[str]:
-    if len(sys.argv) != 2:
-        logging.error("Usage: export-for-ai <directory_path>")
-        return None
+def parse_arguments() -> tuple[Optional[str], Optional[str], Optional[str]]:
+    """
+    Parses command line arguments.
+    Returns a tuple (command, directory_path, template_name).
+    Command can be 'export' or 'generate-ignore'.
+    Template_name is for the 'export' command.
+    Returns (None, None, None) if arguments are invalid.
+    """
+    args = sys.argv[1:] # Exclude script name
 
-    return os.path.abspath(sys.argv[1])
+    command: Optional[str] = None
+    directory_path: Optional[str] = None
+    template_name: Optional[str] = "default" # Default template
+
+    if not args:
+        logging.error(
+            "Usage: \n"
+            "  export-for-ai <directory_path> [-t <template_name>|--template <template_name>] (Exports the project)\n"
+            "  export-for-ai generate-ignore <directory_path>                               (Generates .exportignore content)"
+        )
+        return None, None, None
+
+    if args[0] == "generate-ignore":
+        command = "generate-ignore"
+        if len(args) == 2:
+            directory_path = os.path.abspath(args[1])
+            # Template name is not used for generate-ignore, keep it as default or None
+        else:
+            logging.error("Usage: export-for-ai generate-ignore <directory_path>")
+            return None, None, None
+    else: # Default command is 'export'
+        command = "export"
+        if not args: # Should be caught by the initial `if not args` but good for clarity
+             logging.error("Usage: export-for-ai <directory_path> [-t <template_name>|--template <template_name>]")
+             return None, None, None
+
+        directory_path = os.path.abspath(args[0])
+        
+        # Parse template option
+        i = 1
+        while i < len(args):
+            if args[i] in ("-t", "--template"):
+                if i + 1 < len(args):
+                    template_name = args[i+1]
+                    i += 2
+                else:
+                    logging.error(f"{args[i]} option requires a template name.")
+                    return None, None, None
+            else:
+                # If it's not a recognized option for export, it's an error
+                logging.error(f"Unknown option for export: {args[i]}")
+                logging.error(
+                    "Usage: \n"
+                    "  export-for-ai <directory_path> [-t <template_name>|--template <template_name>] (Exports the project)\n"
+                    "  export-for-ai generate-ignore <directory_path>                               (Generates .exportignore content)"
+                )
+                return None, None, None
+        
+        # Check if directory_path was actually the first argument
+        # This is implicitly handled by directory_path = os.path.abspath(args[0])
+        # and the loop for options starting at i = 1.
+        # If args[0] was -t or --template, it would error as not a valid path.
+        # However, let's ensure directory_path is not an option itself.
+        if directory_path.startswith("-"):
+            logging.error(f"Invalid directory path: {directory_path}. Path cannot start with '-'.")
+            logging.error(
+                "Usage: \n"
+                "  export-for-ai <directory_path> [-t <template_name>|--template <template_name>] (Exports the project)\n"
+                "  export-for-ai generate-ignore <directory_path>                               (Generates .exportignore content)"
+            )
+            return None, None, None
+
+
+    return command, directory_path, template_name
 
 
 def validate_directory(directory_path: str) -> bool:
@@ -206,42 +275,60 @@ def load_config(config_path: str) -> dict:
 def main() -> None:
     setup_logging()
 
-    directory_path = parse_arguments()
-    if not directory_path:
+    command, directory_path, template_name = parse_arguments()
+
+    if not command or not directory_path: # template_name can be None or default
         return
 
-    if not validate_directory(directory_path):
-        return
-
-    export_dir = create_export_directory(directory_path)
-    if not export_dir:
-        return
-
-    # Load section contents from config.yaml
-    # Skipped
-
-    # Export Directory Structure
-    tree_structure = export_tree_structure(directory_path)
-    if tree_structure:
-        tree_output_file = os.path.join(export_dir, "project_structure.txt")
-        if not save_content(tree_structure, tree_output_file, "SolutionTreeView"):
+    if command == "generate-ignore":
+        # Validate directory for generate-ignore command
+        if not os.path.isdir(directory_path): 
+            logging.error(f"Error: '{directory_path}' is not a valid directory for generating ignore file.")
+            return
+        ignore_content = generate_exportignore(directory_path) # generate_exportignore doesn't use templates
+        print(ignore_content)
+        return  # Exit after printing ignore content
+    
+    # Proceed with export logic if command is "export"
+    if command == "export":
+        # Validate directory for export command
+        if not validate_directory(directory_path): # validate_directory checks os.path.isdir
             return
 
-    # Export Folder Contents with Correct Tag and File Path
-    folder_contents = export_folder_contents(directory_path)
-    if folder_contents:
-        folder_output_file = os.path.join(export_dir, "project_contents.md")
-        if not save_content(
-                folder_contents, folder_output_file, tag="EntireSolutionCode"
-        ):
+        # Use "default" if template_name is None (it's set to "default" in parse_arguments if not provided)
+        current_template_name = template_name if template_name else "default"
+        logging.info(f"Using template: {current_template_name}")
+
+
+        export_dir = create_export_directory(directory_path)
+        if not export_dir:
             return
 
-    # Generate project.md combining tree and code with dynamic sections
-    if tree_structure and folder_contents:
-        if not export_project_md(tree_structure, folder_contents, export_dir):
-            return
+        # Load section contents from config.yaml
+        # Skipped
 
-    logging.info(f"Export completed successfully. Files saved in {export_dir}")
+        # Export Directory Structure, passing the template name
+        tree_structure = export_tree_structure(directory_path, template_name=current_template_name)
+        if tree_structure:
+            tree_output_file = os.path.join(export_dir, "project_structure.txt")
+            if not save_content(tree_structure, tree_output_file, "SolutionTreeView"):
+                return
+
+        # Export Folder Contents, passing the template name
+        folder_contents = export_folder_contents(directory_path, template_name=current_template_name)
+        if folder_contents:
+            folder_output_file = os.path.join(export_dir, "project_contents.md")
+            if not save_content(
+                    folder_contents, folder_output_file, tag="EntireSolutionCode"
+            ):
+                return
+
+        # Generate project.md combining tree and code with dynamic sections
+        if tree_structure and folder_contents:
+            if not export_project_md(tree_structure, folder_contents, export_dir):
+                return
+
+        logging.info(f"Export completed successfully. Files saved in {export_dir}")
 
 
 if __name__ == "__main__":

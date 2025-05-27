@@ -15,14 +15,16 @@ def minify_code(content):
     return content
 
 
-def export_folder_content(path):
+def export_folder_content(path: str, template_name: str = "default") -> str:
     """
     Export the content of all included files in the folder.
 
     :param path: The root directory to export.
+    :param template_name: The name of the ignore pattern template to use.
     :return: A string containing the exported content.
     """
-    spec = parse_ignore_file(path)
+    logging.info(f"Exporting folder content for '{path}' using template '{template_name}'")
+    spec = parse_ignore_file(path, template_name=template_name)
     content = []
     for root, dirs, files in os.walk(path):
         # Compute relative path from the root directory
