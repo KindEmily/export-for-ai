@@ -30,7 +30,7 @@ Just export, drag and drop to the context.
 3. Verify the installation:
    ```cmd
    python -m pip show export-for-ai
-   ```
+   ```>
    You should see the package information including the version number.
 
 ### Step 3: Test the Installation
