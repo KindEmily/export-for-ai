@@ -177,7 +177,8 @@ Utilize the best libraries to minimize manual coding
             f"{folder_contents}\n"
             "# EntireSolution Code end \n"
         )
-        project_md_filename = f"{folder_name}-project.md"
+        
+        project_md_filename = f"project-{folder_name}.md"
         project_md_path = os.path.join(export_dir, project_md_filename)
         with open(project_md_path, "w", encoding="utf-8") as f:
             f.write(content)
