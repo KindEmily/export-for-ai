@@ -1,6 +1,6 @@
 [tool.poetry]
 name = "export-for-ai"
-version = "0.3.1"
+version = "0.4.0"
 description = ""
 authors = ["KindEmily <evlasiuk@asclepyus.com>"]
 readme = "README.md"

@@ -36,7 +36,7 @@ def get_folder_name(directory_path: str) -> str:
     return os.path.basename(os.path.abspath(directory_path))
 
 
-def create_export_directory(directory_path: str) -> Optional[str]:
+def create_export_directory(directory_path: str) -> Optional[tuple[str, str]]:
     folder_name = get_folder_name(directory_path)
     export_dir_name = f"exported-from-{folder_name}"
     export_dir_path = os.path.join(directory_path, export_dir_name)
@@ -44,10 +44,10 @@ def create_export_directory(directory_path: str) -> Optional[str]:
     try:
         os.makedirs(export_dir_path, exist_ok=True)
         logging.info(f"Created export directory: {export_dir_path}")
-        return export_dir_path
+        return export_dir_path, folder_name
     except OSError as e:
         logging.error(f"Error creating export directory: {e}")
-        return ""
+        return None
 
 
 def build_tag(
@@ -130,7 +130,7 @@ def export_folder_contents(directory_path: str) -> Optional[str]:
 
 
 def export_project_md(
-        tree_structure: str, folder_contents: str, export_dir: str
+        tree_structure: str, folder_contents: str, export_dir: str, folder_name: str
 ) -> bool:
     """
     Combines the dynamically added sections, tree structure, and folder contents into project.md.
@@ -139,6 +139,7 @@ def export_project_md(
     :param tree_structure: The string representation of the tree structure.
     :param folder_contents: The string representation of the folder contents.
     :param export_dir: The directory where project.md will be saved.
+    :param folder_name: The name of the original folder.
     :return: True if successful, False otherwise.
     """
     try:
@@ -176,10 +177,12 @@ Utilize the best libraries to minimize manual coding
             f"{folder_contents}\n"
             "# EntireSolution Code end \n"
         )
-        project_md_path = os.path.join(export_dir, "project.md")
+        
+        project_md_filename = f"project-{folder_name}.md"
+        project_md_path = os.path.join(export_dir, project_md_filename)
         with open(project_md_path, "w", encoding="utf-8") as f:
             f.write(content)
-        logging.info(f"Project.md exported to {project_md_path}")
+        logging.info(f"{project_md_filename} exported to {project_md_path}")
 
         # Copy content to clipboard
         try:
@@ -213,8 +216,8 @@ def main() -> None:
     if not validate_directory(directory_path):
         return
 
-    export_dir = create_export_directory(directory_path)
-    if not export_dir:
+    export_dir, folder_name = create_export_directory(directory_path)
+    if export_dir is None:
         return
 
     # Load section contents from config.yaml
@@ -238,7 +241,7 @@ def main() -> None:
 
     # Generate project.md combining tree and code with dynamic sections
     if tree_structure and folder_contents:
-        if not export_project_md(tree_structure, folder_contents, export_dir):
+        if not export_project_md(tree_structure, folder_contents, export_dir, folder_name):
             return
 
     logging.info(f"Export completed successfully. Files saved in {export_dir}")
