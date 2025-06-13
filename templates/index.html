@@ -1,0 +1,202 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Export-for-AI App</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        body { font-family: 'Inter', sans-serif; }
+        .list-item:hover .remove-btn { opacity: 1; }
+        #logs-container { background-color: #1a202c; } /* Dark background for logs */
+        .log-line { border-bottom: 1px solid #2d3748; }
+    </style>
+</head>
+<body class="bg-gray-100 text-gray-800">
+
+    <div class="container mx-auto p-4 md:p-8 max-w-4xl">
+        <header class="mb-8 text-center">
+            <h1 class="text-4xl font-bold text-gray-900">Export-for-AI</h1>
+            <p class="text-gray-600 mt-1">A simple UI to manage and run your project exports.</p>
+        </header>
+
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
+            <!-- Left Column: Configuration -->
+            <div>
+                <section class="mb-6 p-6 bg-white rounded-xl shadow-md">
+                    <h2 class="text-xl font-semibold mb-4 text-gray-800">1. Set Export Destination</h2>
+                    <div class="flex items-center space-x-2">
+                        <input type="text" id="export-folder-input" placeholder="Absolute path for final exports" class="flex-grow w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500">
+                    </div>
+                </section>
+
+                <section class="p-6 bg-white rounded-xl shadow-md">
+                    <h2 class="text-xl font-semibold mb-4 text-gray-800">2. Manage Repositories</h2>
+                    <div class="flex items-center space-x-2 mb-4">
+                        <input type="text" id="repo-input" placeholder="Absolute path to a repository" class="flex-grow w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500">
+                        <button id="add-repo-btn" class="bg-indigo-600 text-white font-semibold py-2 px-4 rounded-lg hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 shrink-0">Add</button>
+                    </div>
+                    <ul id="repo-list" class="space-y-2 max-h-60 overflow-y-auto pr-2"></ul>
+                </section>
+            </div>
+
+            <!-- Right Column: Execution and Logs -->
+            <div class="p-6 bg-white rounded-xl shadow-md flex flex-col">
+                <h2 class="text-xl font-semibold mb-4 text-gray-800">3. Run & Monitor</h2>
+                <button id="run-export-btn" class="w-full bg-green-600 text-white font-bold py-3 px-4 rounded-lg hover:bg-green-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-green-500 transition-all duration-200 disabled:bg-gray-400">
+                    Run All Exports
+                </button>
+                <p id="status-text" class="text-center text-sm text-gray-500 mt-2 h-5"></p>
+                
+                <h3 class="font-semibold text-gray-700 mt-4 mb-2">Live Logs</h3>
+                <div id="logs-container" class="flex-grow w-full p-3 font-mono text-sm text-gray-200 border border-gray-700 rounded-lg overflow-y-auto h-64">
+                    <div id="logs-output"></div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            const repoInput = document.getElementById('repo-input');
+            const addRepoBtn = document.getElementById('add-repo-btn');
+            const repoList = document.getElementById('repo-list');
+            const exportFolderInput = document.getElementById('export-folder-input');
+            const runExportBtn = document.getElementById('run-export-btn');
+            const logsOutput = document.getElementById('logs-output');
+            const statusText = document.getElementById('status-text');
+
+            let config = {
+                export_destination: "",
+                repositories: []
+            };
+
+            const api = {
+                async getConfig() {
+                    const response = await fetch('/api/config');
+                    return response.json();
+                },
+                async saveConfig(newConfig) {
+                    await fetch('/api/config', {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify(newConfig)
+                    });
+                }
+            };
+
+            const renderRepos = () => {
+                repoList.innerHTML = '';
+                if (config.repositories.length === 0) {
+                    repoList.innerHTML = '<li class="text-center text-gray-500 py-2">No repositories added.</li>';
+                }
+                config.repositories.forEach((repo, index) => {
+                    const li = document.createElement('li');
+                    li.className = 'list-item flex items-center justify-between p-3 bg-gray-100 rounded-lg';
+                    li.innerHTML = `
+                        <span class="font-mono text-sm truncate" title="${repo}">${repo}</span>
+                        <button class="remove-btn opacity-0 transition-opacity text-red-500 hover:text-red-700 font-semibold" data-index="${index}">Remove</button>
+                    `;
+                    repoList.appendChild(li);
+                });
+            };
+
+            const updateAndSaveConfig = () => {
+                config.export_destination = exportFolderInput.value.trim();
+                api.saveConfig(config);
+            };
+
+            const addRepo = () => {
+                const repoPath = repoInput.value.trim();
+                if (repoPath && !config.repositories.includes(repoPath)) {
+                    config.repositories.push(repoPath);
+                    repoInput.value = '';
+                    renderRepos();
+                    updateAndSaveConfig();
+                }
+            };
+            
+            repoInput.addEventListener('keypress', (e) => e.key === 'Enter' && addRepo());
+            addRepoBtn.addEventListener('click', addRepo);
+            exportFolderInput.addEventListener('change', updateAndSaveConfig);
+
+            repoList.addEventListener('click', (e) => {
+                if (e.target.classList.contains('remove-btn')) {
+                    const index = parseInt(e.target.dataset.index, 10);
+                    config.repositories.splice(index, 1);
+                    renderRepos();
+                    updateAndSaveConfig();
+                }
+            });
+
+            runExportBtn.addEventListener('click', async () => {
+                if (!config.export_destination || config.repositories.length === 0) {
+                    alert('Please set the export destination and add at least one repository.');
+                    return;
+                }
+
+                runExportBtn.disabled = true;
+                statusText.textContent = "Exporting...";
+                logsOutput.innerHTML = "";
+
+                const eventSource = new EventSource(`/api/run-export`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(config)
+                });
+                
+                // Note: EventSource doesn't support sending a body. This is a common misconception.
+                // A workaround would be to switch to fetch with a streaming body reader, or pass config via query params.
+                // For simplicity, this example will use a separate fetch to trigger and EventSource to listen.
+                // Let's refactor to a more robust fetch-based streaming approach.
+
+                try {
+                    const response = await fetch('/api/run-export', {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify(config)
+                    });
+
+                    const reader = response.body.getReader();
+                    const decoder = new TextDecoder();
+                    
+                    while (true) {
+                        const { value, done } = await reader.read();
+                        if (done) break;
+                        
+                        const chunk = decoder.decode(value, { stream: true });
+                        const lines = chunk.split('\n\n');
+
+                        lines.forEach(line => {
+                            if(line.startsWith('data: ')) {
+                                const logLine = document.createElement('div');
+                                logLine.className = 'log-line p-1';
+                                logLine.textContent = line.substring(6); // remove "data: "
+                                logsOutput.appendChild(logLine);
+                                logsOutput.scrollTop = logsOutput.scrollHeight;
+                            }
+                        });
+                    }
+                } catch (error) {
+                    const logLine = document.createElement('div');
+                    logLine.className = 'log-line p-1 text-red-400';
+                    logLine.textContent = `[UI-ERROR] Failed to connect to server: ${error.message}`;
+                    logsOutput.appendChild(logLine);
+                } finally {
+                    runExportBtn.disabled = false;
+                    statusText.textContent = "Finished.";
+                }
+            });
+
+            const initialize = async () => {
+                config = await api.getConfig();
+                exportFolderInput.value = config.export_destination;
+                renderRepos();
+            };
+
+            initialize();
+        });
+    </script>
+</body>
+</html>
