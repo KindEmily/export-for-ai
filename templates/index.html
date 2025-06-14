@@ -22,7 +22,6 @@
         </header>
 
         <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
-            <!-- Left Column: Configuration -->
             <div>
                 <section class="mb-6 p-6 bg-white rounded-xl shadow-md">
                     <h2 class="text-xl font-semibold mb-4 text-gray-800">1. Set Export Destination</h2>
@@ -31,21 +30,30 @@
                     </div>
                 </section>
 
-                <section class="p-6 bg-white rounded-xl shadow-md">
-                    <h2 class="text-xl font-semibold mb-4 text-gray-800">2. Manage Repositories</h2>
+                <section class="p-6 bg-white rounded-xl shadow-md mb-6">
+                    <h2 class="text-xl font-semibold mb-4 text-gray-800">2. Manage Repositories to Export</h2>
                     <div class="flex items-center space-x-2 mb-4">
                         <input type="text" id="repo-input" placeholder="Absolute path to a repository" class="flex-grow w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500">
                         <button id="add-repo-btn" class="bg-indigo-600 text-white font-semibold py-2 px-4 rounded-lg hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 shrink-0">Add</button>
                     </div>
-                    <ul id="repo-list" class="space-y-2 max-h-60 overflow-y-auto pr-2"></ul>
+                    <ul id="repo-list" class="space-y-2 max-h-40 overflow-y-auto pr-2"></ul>
+                </section>
+
+                <section class="p-6 bg-white rounded-xl shadow-md">
+                    <h2 class="text-xl font-semibold mb-4 text-gray-800">3. Manage Assets to Copy</h2>
+                    <p class="text-sm text-gray-500 mb-4">Add files or folders to be copied directly to the export destination without processing.</p>
+                    <div class="flex items-center space-x-2 mb-4">
+                        <input type="text" id="asset-input" placeholder="Absolute path to a file or folder" class="flex-grow w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500">
+                        <button id="add-asset-btn" class="bg-indigo-600 text-white font-semibold py-2 px-4 rounded-lg hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 shrink-0">Add</button>
+                    </div>
+                    <ul id="asset-list" class="space-y-2 max-h-40 overflow-y-auto pr-2"></ul>
                 </section>
             </div>
 
-            <!-- Right Column: Execution and Logs -->
             <div class="p-6 bg-white rounded-xl shadow-md flex flex-col">
-                <h2 class="text-xl font-semibold mb-4 text-gray-800">3. Run & Monitor</h2>
+                <h2 class="text-xl font-semibold mb-4 text-gray-800">4. Run & Monitor</h2>
                 <button id="run-export-btn" class="w-full bg-green-600 text-white font-bold py-3 px-4 rounded-lg hover:bg-green-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-green-500 transition-all duration-200 disabled:bg-gray-400">
-                    Run All Exports
+                    Run All Tasks
                 </button>
                 <p id="status-text" class="text-center text-sm text-gray-500 mt-2 h-5"></p>
                 
@@ -59,17 +67,23 @@
 
     <script>
         document.addEventListener('DOMContentLoaded', () => {
-            const repoInput = document.getElementById('repo-input');
-            const addRepoBtn = document.getElementById('add-repo-btn');
-            const repoList = document.getElementById('repo-list');
-            const exportFolderInput = document.getElementById('export-folder-input');
-            const runExportBtn = document.getElementById('run-export-btn');
-            const logsOutput = document.getElementById('logs-output');
-            const statusText = document.getElementById('status-text');
+            const elements = {
+                repoInput: document.getElementById('repo-input'),
+                addRepoBtn: document.getElementById('add-repo-btn'),
+                repoList: document.getElementById('repo-list'),
+                assetInput: document.getElementById('asset-input'),
+                addAssetBtn: document.getElementById('add-asset-btn'),
+                assetList: document.getElementById('asset-list'),
+                exportFolderInput: document.getElementById('export-folder-input'),
+                runExportBtn: document.getElementById('run-export-btn'),
+                logsOutput: document.getElementById('logs-output'),
+                statusText: document.getElementById('status-text')
+            };
 
             let config = {
                 export_destination: "",
-                repositories: []
+                repositories: [],
+                assets_to_copy: []
             };
 
             const api = {
@@ -86,70 +100,82 @@
                 }
             };
 
-            const renderRepos = () => {
-                repoList.innerHTML = '';
-                if (config.repositories.length === 0) {
-                    repoList.innerHTML = '<li class="text-center text-gray-500 py-2">No repositories added.</li>';
+            const renderList = (listEl, items, type) => {
+                const typeName = type.charAt(0).toUpperCase() + type.slice(1);
+                listEl.innerHTML = '';
+                if (!items || items.length === 0) {
+                    listEl.innerHTML = `<li class="text-center text-gray-500 py-2">No ${typeName}s added.</li>`;
+                    return;
                 }
-                config.repositories.forEach((repo, index) => {
+                items.forEach((item, index) => {
                     const li = document.createElement('li');
                     li.className = 'list-item flex items-center justify-between p-3 bg-gray-100 rounded-lg';
                     li.innerHTML = `
-                        <span class="font-mono text-sm truncate" title="${repo}">${repo}</span>
-                        <button class="remove-btn opacity-0 transition-opacity text-red-500 hover:text-red-700 font-semibold" data-index="${index}">Remove</button>
+                        <span class="font-mono text-sm truncate" title="${item}">${item}</span>
+                        <button class="remove-btn opacity-0 transition-opacity text-red-500 hover:text-red-700 font-semibold" data-index="${index}" data-type="${type}">Remove</button>
                     `;
-                    repoList.appendChild(li);
+                    listEl.appendChild(li);
                 });
             };
 
             const updateAndSaveConfig = () => {
-                config.export_destination = exportFolderInput.value.trim();
+                config.export_destination = elements.exportFolderInput.value.trim();
                 api.saveConfig(config);
             };
 
             const addRepo = () => {
-                const repoPath = repoInput.value.trim();
+                const repoPath = elements.repoInput.value.trim();
                 if (repoPath && !config.repositories.includes(repoPath)) {
                     config.repositories.push(repoPath);
-                    repoInput.value = '';
-                    renderRepos();
+                    elements.repoInput.value = '';
+                    renderList(elements.repoList, config.repositories, 'repository');
                     updateAndSaveConfig();
                 }
             };
-            
-            repoInput.addEventListener('keypress', (e) => e.key === 'Enter' && addRepo());
-            addRepoBtn.addEventListener('click', addRepo);
-            exportFolderInput.addEventListener('change', updateAndSaveConfig);
 
-            repoList.addEventListener('click', (e) => {
+            const addAsset = () => {
+                const assetPath = elements.assetInput.value.trim();
+                if (assetPath && !config.assets_to_copy.includes(assetPath)) {
+                    config.assets_to_copy.push(assetPath);
+                    elements.assetInput.value = '';
+                    renderList(elements.assetList, config.assets_to_copy, 'asset');
+                    updateAndSaveConfig();
+                }
+            };
+
+            elements.repoInput.addEventListener('keypress', (e) => e.key === 'Enter' && addRepo());
+            elements.addRepoBtn.addEventListener('click', addRepo);
+            elements.assetInput.addEventListener('keypress', (e) => e.key === 'Enter' && addAsset());
+            elements.addAssetBtn.addEventListener('click', addAsset);
+            elements.exportFolderInput.addEventListener('change', updateAndSaveConfig);
+
+            document.querySelector('.container').addEventListener('click', (e) => {
                 if (e.target.classList.contains('remove-btn')) {
                     const index = parseInt(e.target.dataset.index, 10);
-                    config.repositories.splice(index, 1);
-                    renderRepos();
+                    const type = e.target.dataset.type;
+                    if (type === 'repository') {
+                        config.repositories.splice(index, 1);
+                        renderList(elements.repoList, config.repositories, 'repository');
+                    } else if (type === 'asset') {
+                        config.assets_to_copy.splice(index, 1);
+                        renderList(elements.assetList, config.assets_to_copy, 'asset');
+                    }
                     updateAndSaveConfig();
                 }
             });
 
-            runExportBtn.addEventListener('click', async () => {
-                if (!config.export_destination || config.repositories.length === 0) {
-                    alert('Please set the export destination and add at least one repository.');
+            elements.runExportBtn.addEventListener('click', async () => {
+                const hasRepos = config.repositories && config.repositories.length > 0;
+                const hasAssets = config.assets_to_copy && config.assets_to_copy.length > 0;
+
+                if (!config.export_destination || (!hasRepos && !hasAssets)) {
+                    alert('Please set the export destination and add at least one repository or asset.');
                     return;
                 }
 
-                runExportBtn.disabled = true;
-                statusText.textContent = "Exporting...";
-                logsOutput.innerHTML = "";
-
-                const eventSource = new EventSource(`/api/run-export`, {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify(config)
-                });
-                
-                // Note: EventSource doesn't support sending a body. This is a common misconception.
-                // A workaround would be to switch to fetch with a streaming body reader, or pass config via query params.
-                // For simplicity, this example will use a separate fetch to trigger and EventSource to listen.
-                // Let's refactor to a more robust fetch-based streaming approach.
+                elements.runExportBtn.disabled = true;
+                elements.statusText.textContent = "Processing...";
+                elements.logsOutput.innerHTML = "";
 
                 try {
                     const response = await fetch('/api/run-export', {
@@ -172,9 +198,9 @@
                             if(line.startsWith('data: ')) {
                                 const logLine = document.createElement('div');
                                 logLine.className = 'log-line p-1';
-                                logLine.textContent = line.substring(6); // remove "data: "
-                                logsOutput.appendChild(logLine);
-                                logsOutput.scrollTop = logsOutput.scrollHeight;
+                                logLine.textContent = line.substring(6);
+                                elements.logsOutput.appendChild(logLine);
+                                elements.logsOutput.scrollTop = elements.logsOutput.scrollHeight;
                             }
                         });
                     }
@@ -182,17 +208,18 @@
                     const logLine = document.createElement('div');
                     logLine.className = 'log-line p-1 text-red-400';
                     logLine.textContent = `[UI-ERROR] Failed to connect to server: ${error.message}`;
-                    logsOutput.appendChild(logLine);
+                    elements.logsOutput.appendChild(logLine);
                 } finally {
-                    runExportBtn.disabled = false;
-                    statusText.textContent = "Finished.";
+                    elements.runExportBtn.disabled = false;
+                    elements.statusText.textContent = "Finished.";
                 }
             });
 
             const initialize = async () => {
                 config = await api.getConfig();
-                exportFolderInput.value = config.export_destination;
-                renderRepos();
+                elements.exportFolderInput.value = config.export_destination;
+                renderList(elements.repoList, config.repositories, 'repository');
+                renderList(elements.assetList, config.assets_to_copy, 'asset');
             };
 
             initialize();

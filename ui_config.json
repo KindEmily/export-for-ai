@@ -1,6 +1,13 @@
 {
   "export_destination": "C:\\Repos\\current LLM chat\\foo",
   "repositories": [
-    "C:\\Repos\\export-for-ai\\templates"
+    "C:\\Repos\\ppfl-santanna-web",
+    "C:\\Repos\\ppfl-santanna-api",
+    "C:\\Repos\\ppfl-santanna-fl-client-server"
+  ],
+  "assets_to_copy": [
+    "C:\\Repos\\docker-compose.combined.yml",
+    "C:\\Repos\\docker-bake.hcl.md",
+    "C:\\Repos\\current LLM chat\\THE_GOAL.md"
   ]
 }
