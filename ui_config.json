@@ -8,6 +8,12 @@
   "assets_to_copy": [
     "C:\\Repos\\docker-compose.combined.yml",
     "C:\\Repos\\docker-bake.hcl.md",
-    "C:\\Repos\\current LLM chat\\THE_GOAL.md"
+    "C:\\Repos\\current LLM chat\\THE_GOAL.md",
+    "C:\\Repos\\.env",
+    "C:\\Repos\\current LLM chat\\pbis\\Dynamic Orchestrator Deployment Infrastructure #25.md",
+    "C:\\Repos\\current LLM chat\\pbis\\JWT Authentication for Client-Orchestrator Communication #23.md",
+    "C:\\Repos\\current LLM chat\\pbis\\Orchestrator Communication Architecture and Port Management #36.md",
+    "C:\\Repos\\current LLM chat\\pbis\\Orchestrator RabbitMQ Configuration and Real Payload Integration #24.md",
+    "C:\\Repos\\ppfl-santanna-fl-client-server\\scripts\\test-workflow.sh"
   ]
 }
