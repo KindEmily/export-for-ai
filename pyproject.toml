@@ -1,3 +1,4 @@
+# File: pyproject.toml
 [tool.poetry]
 name = "export-for-ai"
 version = "0.5.0"
@@ -30,4 +31,5 @@ requires = ["poetry-core"]
 build-backend = "poetry.core.masonry.api"
 
 [tool.poetry.scripts]
-export-for-ai = "app_main:main"
+# Changed the command name from 'export-for-ai' to 'efa'
+efa = "systray_app:main"

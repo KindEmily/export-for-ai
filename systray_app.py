@@ -9,6 +9,7 @@ import logging
 import time
 import requests
 import traceback
+import subprocess # Added for shell commands
 
 import pystray
 from PIL import Image, ImageDraw
@@ -25,6 +26,7 @@ icon = None
 UI_CONFIG_PATH = os.path.join(os.path.dirname(__file__), "ui_config.json")
 LOG_FILE = os.path.join(os.path.dirname(__file__), "systray_crash.log")
 BASE_URL = "http://127.0.0.1:8000"
+AUTOSTART_VBS_FILENAME = "launch_export_for_ai.vbs"
 
 # --- Setup ---
 def setup_logging():
@@ -179,6 +181,107 @@ def on_quit(icon_instance, item):
     icon_instance.stop()
     sys.exit(0)
 
+# --- Auto-start Functionality ---
+def get_startup_folder() -> Optional[str]:
+    """Returns the path to the Windows Startup folder."""
+    # This environment variable is typical for Windows Startup folder
+    startup_path = os.path.join(os.getenv('APPDATA'), 'Microsoft', 'Windows', 'Start Menu', 'Programs', 'Startup')
+    if os.path.isdir(startup_path):
+        return startup_path
+    logging.error(f"Windows Startup folder not found: {startup_path}")
+    return None
+
+def toggle_autostart(icon_instance: pystray.Icon, item: pystray.MenuItem) -> None:
+    """Toggles the application's auto-start setting."""
+    startup_folder = get_startup_folder()
+    if not startup_folder:
+        icon_instance.notify("Failed to find Windows Startup folder.", "Auto-start Error")
+        return
+
+    vbs_path = os.path.join(startup_folder, AUTOSTART_VBS_FILENAME)
+    
+    if os.path.exists(vbs_path):
+        # Auto-start is currently enabled, so disable it
+        try:
+            os.remove(vbs_path)
+            logging.info("Auto-start disabled.")
+            icon_instance.notify("Auto-start disabled for Export for AI.", "Settings Updated")
+        except OSError as e:
+            logging.error(f"Error disabling auto-start: {e}")
+            icon_instance.notify(f"Failed to disable auto-start: {e}", "Auto-start Error")
+    else:
+        # Auto-start is currently disabled, so enable it
+        try:
+            app_exe_path = sys.executable
+            # VBScript to launch pythonw.exe (for .py) or the .exe silently
+            # If running as .py, sys.executable is python.exe or pythonw.exe
+            # If running as bundled .exe, sys.executable is the .exe itself
+            # We want to ensure it runs without a console window.
+            # For bundled executables, they usually run silently by default if built as a windowed app.
+            # For .py, use 'pythonw.exe' for silent execution.
+            
+            # Check if sys.executable points to python.exe (meaning it's run as a script)
+            # Or if it's already a .exe and we want to ensure it's hidden.
+            if sys.executable.endswith("python.exe"):
+                # Running as a script, use pythonw.exe
+                target_exe = sys.executable.replace("python.exe", "pythonw.exe")
+                if not os.path.exists(target_exe):
+                    logging.warning(f"pythonw.exe not found at {target_exe}, attempting with python.exe. Console may appear.")
+                    target_exe = sys.executable
+            else:
+                # Assume it's a packaged .exe or a script launched directly via pythonw.exe
+                target_exe = sys.executable
+
+            vbs_content = f"""
+Set WshShell = CreateObject("WScript.Shell")
+WshShell.Run chr(34) & "{target_exe}" & chr(34), 0, false
+Set WshShell = Nothing
+"""
+            with open(vbs_path, "w") as f:
+                f.write(vbs_content)
+            logging.info("Auto-start enabled.")
+            icon_instance.notify("Auto-start enabled for Export for AI.", "Settings Updated")
+        except Exception as e:
+            logging.error(f"Error enabling auto-start: {e}")
+            icon_instance.notify(f"Failed to enable auto-start: {e}", "Auto-start Error")
+    
+    # Update the menu item text to reflect the current state
+    update_autostart_menu_item()
+
+
+def update_autostart_menu_item():
+    """Updates the 'Toggle Autostart' menu item text based on current status."""
+    global icon
+    if not icon:
+        return
+    
+    startup_folder = get_startup_folder()
+    if not startup_folder:
+        return
+
+    vbs_path = os.path.join(startup_folder, AUTOSTART_VBS_FILENAME)
+    
+    autostart_enabled = os.path.exists(vbs_path)
+    
+    # Find and update the specific menu item
+    new_menu_items = []
+    found = False
+    for item in icon.menu:
+        if isinstance(item, pystray.MenuItem) and item.text.startswith("Toggle Auto-start"):
+            item_text = f"Toggle Auto-start (Current: {'Enabled' if autostart_enabled else 'Disabled'})"
+            new_menu_items.append(pystray.MenuItem(item_text, toggle_autostart))
+            found = True
+        else:
+            new_menu_items.append(item)
+    
+    if not found:
+        # If not found (first run or item not in initial menu), add it
+        item_text = f"Toggle Auto-start (Current: {'Enabled' if autostart_enabled else 'Disabled'})"
+        new_menu_items.insert(2, pystray.MenuItem(item_text, toggle_autostart)) # Insert after "Run Export"
+
+    icon.menu = pystray.Menu(*new_menu_items)
+
+
 # --- Main Execution ---
 def main():
     global icon
@@ -186,12 +289,19 @@ def main():
     logging.info("Initializing systray application...")
     
     icon_image = create_icon_image()
-    menu = pystray.Menu(
+    
+    # Initial menu definition, auto-start text will be updated after creation
+    menu_items = [
         pystray.MenuItem("Open UI", open_ui, default=True),
         pystray.MenuItem("Run Export", on_export_activate),
+        pystray.MenuItem("Toggle Auto-start (Checking status...)", toggle_autostart), # Placeholder text
         pystray.MenuItem("Quit", on_quit)
-    )
-    icon = pystray.Icon("export_for_ai", icon_image, "Export for AI", menu)
+    ]
+    
+    icon = pystray.Icon("export_for_ai", icon_image, "Export for AI", pystray.Menu(*menu_items))
+
+    # Update the auto-start menu item immediately after icon creation
+    update_autostart_menu_item()
 
     def run_hotkey_listener():
         logging.info("Starting hotkey listener... (Ctrl+Shift+Q for UI, Ctrl+Shift+E for Export)")
