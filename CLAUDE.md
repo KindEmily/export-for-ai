@@ -130,3 +130,8 @@ The system can process multiple repositories in batch mode, copying all generate
 - Comprehensive logging throughout all components
 - Graceful fallbacks for missing assets (generates placeholder icons)
 - Crash logging for system tray application
+
+## Best Practices and Tools
+
+### Documentation
+- Use mermaid diagrams in .md files for visualization 
