@@ -3,9 +3,12 @@
   "repositories": [
     "C:\\Repos\\ppfl-santanna-web",
     "C:\\Repos\\ppfl-santanna-api",
-    "C:\\Repos\\ppfl-santanna-fl-client-server",
     "C:\\Repos\\ppfl-orchestrator-infra",
-    "C:\\Repos\\export-for-ai"
+    "C:\\Repos\\export-for-ai",
+    "C:\\Repos\\delete me\\ppfl-python-worker",
+    "C:\\Repos\\fl-integration\\ppfl-santanna-fl-client-server",
+    "C:\\Repos\\.demo\\adsasddsdas_client_package (2)",
+    "C:\\Repos\\delete me\\delete me\\ppfl-python-worker"
   ],
   "assets_to_copy": [
     "C:\\Repos\\docker-compose.combined.yml",
