@@ -1,6 +1,7 @@
+# File: pyproject.toml
 [tool.poetry]
 name = "export-for-ai"
-version = "0.3.1"
+version = "0.5.0"
 description = ""
 authors = ["KindEmily <evlasiuk@asclepyus.com>"]
 readme = "README.md"
@@ -14,6 +15,12 @@ pathspec = "^0.12.1"
 anytree = "^2.12.1"
 pyyaml = "^6.0.2"
 pyperclip = "^1.9.0"
+fastapi = "^0.111.0"
+uvicorn = {extras = ["standard"], version = "^0.30.1"}
+pystray = "^0.19.0"
+pynput = "^1.7.6"
+Pillow = "^10.4.0"
+requests = "^2.32.4"
 
 [tool.poetry.group.dev.dependencies]
 anytree = "^2.12.1"
@@ -24,4 +31,5 @@ requires = ["poetry-core"]
 build-backend = "poetry.core.masonry.api"
 
 [tool.poetry.scripts]
-export-for-ai = "export_for_ai.main:main"
+# Changed the command name from 'export-for-ai' to 'efa'
+efa = "systray_app:main"

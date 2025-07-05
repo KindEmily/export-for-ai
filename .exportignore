@@ -78,13 +78,6 @@ celerybeat-schedule
 # SageMath parsed files
 *.sage.py
 
-# Environments
-.env
-.venv
-env/
-venv/
-ENV/
-
 # Spyder project settings
 .spyderproject
 .spyproject
@@ -110,10 +103,6 @@ exported-from-*
 *.jpeg
 *.png
 *.svg
-
-# Documentation 
-*.md
-*.txt
 
 /output/
 .bin/
