@@ -1,5 +1,6 @@
-import os
 import logging
+import os
+
 from pathspec import PathSpec
 from pathspec.patterns import GitWildMatchPattern
 
@@ -46,13 +47,11 @@ DEFAULT_IGNORE_PATTERNS = [
     'instance/',
     '.webassets-cache',
     '.scrapy',
-    'docs/_build/',
     'target/',
     '.ipynb_checkpoints',
     '.python-version',
     'celerybeat-schedule',
     '*.sage.py',
-    '.env',
     '.venv',
     'env/',
     'venv/',
@@ -71,7 +70,9 @@ DEFAULT_IGNORE_PATTERNS = [
     '*.txt',
     '/output/',
     '.bin/',
+    '.obj/',
 ]
+
 
 def parse_ignore_file(directory):
     """
@@ -82,7 +83,7 @@ def parse_ignore_file(directory):
     """
     ignore_file_path = os.path.join(directory, '.exportignore')
     patterns = DEFAULT_IGNORE_PATTERNS.copy()
-    
+
     if os.path.exists(ignore_file_path):
         with open(ignore_file_path, 'r') as f:
             for line in f:
@@ -92,10 +93,11 @@ def parse_ignore_file(directory):
         logging.info(f"Loaded ignore patterns from .exportignore")
     else:
         logging.warning("No .exportignore file found. Using default exclusion rules.")
-    
+
     spec = PathSpec.from_lines(GitWildMatchPattern, patterns)
     logging.debug(f"Final ignore patterns: {patterns}")
     return spec
+
 
 def should_include_item(item, spec):
     """
