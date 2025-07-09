@@ -68,7 +68,6 @@ DEFAULT_IGNORE_PATTERNS = [
     '*.jpeg',
     '*.png',
     '*.svg',
-    '*.md',
     '*.txt',
     '/output/',
     '.bin/',

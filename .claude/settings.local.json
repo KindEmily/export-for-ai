@@ -14,7 +14,9 @@
       "Bash(poetry lock:*)",
       "Bash(efa:*)",
       "Bash(poetry run efa:*)",
-      "Bash(poetry:*)"
+      "Bash(poetry:*)",
+      "Bash(pip install:*)",
+      "Bash(pip3 install:*)"
     ],
     "deny": []
   }
