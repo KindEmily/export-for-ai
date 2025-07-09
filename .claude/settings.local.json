@@ -1,7 +1,20 @@
 {
   "permissions": {
     "allow": [
-      "Bash(mkdir:*)"
+      "Bash(mkdir:*)",
+      "Bash(python:*)",
+      "Bash(make:*)",
+      "Bash(PYTHONPATH=/mnt/c/Repos/export-for-ai/src python3 -m export_for_ai test_project/)",
+      "Bash(PYTHONPATH=/mnt/c/Repos/export-for-ai/src python3 -c \"from export_for_ai.main import main; main()\" test_project/)",
+      "Bash(ls:*)",
+      "Bash(export:*)",
+      "Bash(poetry --version)",
+      "Bash(poetry install:*)",
+      "Bash(poetry add:*)",
+      "Bash(poetry lock:*)",
+      "Bash(efa:*)",
+      "Bash(poetry run efa:*)",
+      "Bash(poetry:*)"
     ],
     "deny": []
   }

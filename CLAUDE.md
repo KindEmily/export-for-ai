@@ -26,30 +26,39 @@ The project uses a multi-interface architecture:
 
 ### Development Setup
 ```bash
-# Install dependencies
-poetry install
+# Using Makefile (recommended)
+make install          # Auto-detect Poetry/pip and install
+make install-poetry   # Install with Poetry
+make install-pip     # Install with pip
 
-# Development install
+# Manual installation
+poetry install
+# OR
 python -m pip install -e .
 ```
 
 ### Running the Application
 ```bash
-# CLI usage
-export-for-ai <directory_path>
-efa <directory_path>  # Alternative command
+# Using Makefile (recommended)
+make run-systray     # Start system tray app (main interface)
+make run-web         # Start web UI
+make run-cli         # Test CLI with sample project
+make start           # Install and run systray in one command
 
-# Batch processing with config
-export-for-ai --config ui_config.json
-app_main.py --config ui_config.json
+# Manual execution
+python systray_app.py  # System tray with hotkeys
+python web_ui.py       # Web UI on http://127.0.0.1:8000
+export-for-ai <path>   # CLI usage
+efa <path>            # Alternative CLI command
+```
 
-# Web UI
-python web_ui.py
-# Opens on http://127.0.0.1:8000
-
-# System tray app
-python systray_app.py
-# Hotkeys: Ctrl+Shift+Q (open UI), Ctrl+Shift+E (export)
+### Maintenance Commands
+```bash
+make reinstall       # Clean and reinstall dependencies (after code changes)
+make clean           # Clean temporary files and build artifacts
+make test            # Run manual tests
+make version         # Show version information
+make help            # Show all available commands
 ```
 
 ### Testing
