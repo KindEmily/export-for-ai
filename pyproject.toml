@@ -31,4 +31,4 @@ build-backend = "poetry.core.masonry.api"
 
 [tool.poetry.scripts]
 # Changed the command name from 'export-for-ai' to 'efa'
-efa = "systray_app:main"
+efa = "export_for_ai.main:main"

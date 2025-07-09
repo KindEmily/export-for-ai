@@ -5,16 +5,19 @@
     "C:\\Repos\\ppfl-santanna-api",
     "C:\\Repos\\ppfl-orchestrator-infra",
     "C:\\Repos\\export-for-ai",
-    "C:\\Repos\\delete me\\ppfl-python-worker",
     "C:\\Repos\\fl-integration\\ppfl-santanna-fl-client-server",
     "C:\\Repos\\.demo\\adsasddsdas_client_package (2)",
-    "C:\\Repos\\delete me\\delete me\\ppfl-python-worker"
+    "C:\\Repos\\all-ai-agents",
+    "C:\\Repos\\ppfl-santanna-api\\docs\\",
+    "C:\\Repos\\ppfl-santanna-api\\docs\\datamodel",
+    "C:\\Repos\\ppfl-santanna-api\\docs\\backend",
+    "C:\\Repos\\ppfl-santanna-api\\docs\\documentation",
+    "C:\\Repos\\ppfl-santanna-api\\docs\\coding-rules"
   ],
   "assets_to_copy": [
     "C:\\Repos\\docker-compose.combined.yml",
     "C:\\Repos\\docker-bake.hcl.md",
     "C:\\Repos\\current LLM chat\\THE_GOAL.md",
-    "C:\\Repos\\.env",
-    "C:\\Repos\\ppfl-santanna-fl-client-server\\scripts\\test-workflow.sh"
+    "C:\\Repos\\.env"
   ]
 }
